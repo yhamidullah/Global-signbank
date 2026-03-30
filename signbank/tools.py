@@ -1763,7 +1763,8 @@ def get_selected_datasets_for_user(user):
         return selected_datasets
     else:
         # Make sure a non-empty set is returned, for anonymous users when no datasets are public
-        selected_datasets = Dataset.objects.filter(acronym=DEFAULT_DATASET_ACRONYM)
+        selected_datasets = Dataset.objects.filter(is_public=True)
+        selected_datasets = Dataset.objects.filter(acronym=DEFAULT_DATASET_ACRONYM) if not selected_datasets else selected_datasets
         return selected_datasets
 
 
