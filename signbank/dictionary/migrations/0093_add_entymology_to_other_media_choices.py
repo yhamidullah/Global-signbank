@@ -9,7 +9,7 @@ def add_entymology_choice(apps, schema_editor):
     FieldChoice = apps.get_model('dictionary', 'FieldChoice')
     used_machine_values = [h.machine_value for h in FieldChoice.objects.filter(field='OtherMediaType',
                                                                                machine_value__gt=1)]
-    max_used_machine_value = max(used_machine_values)
+    max_used_machine_value = max(used_machine_values) if used_machine_values else 0
     new_field_choice, created = FieldChoice.objects.get_or_create(field='OtherMediaType', name='Etymology',
                                                                   machine_value=max_used_machine_value+1)
     for language in MODELTRANSLATION_LANGUAGES:
