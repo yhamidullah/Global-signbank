@@ -26,7 +26,7 @@ class Command(BaseCommand):
                  delete_gen_feedback = Permission.objects.get(codename='delete_generalfeedback', content_type__model__exact='generalfeedback')
                  change_page = Permission.objects.get(codename='change_page', content_type__model__exact='page')
                  add_page = Permission.objects.get(codename='add_page', content_type__model__exact='page')
-                 add_attachment = Permission.objects.get(codename='add_attachment', content_type__app_label__exact='attachments')
+                 add_attachment = Permission.objects.get(codename='add_attachment', content_type__model__exact='attachment')
             except Permission.DoesNotExist as e:
                  raise CommandError(f'Permission not found: {e}. Run migrate first.')
             # Publisher
