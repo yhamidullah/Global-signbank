@@ -6,8 +6,12 @@ from guardian.models import UserObjectPermission, GroupObjectPermission
 
 
 def remove_can_view_dataset(apps, schema_editor):
-    view_dataset_perm = Permission.objects.get(codename='view_dataset')
-    can_view_dataset_perm = Permission.objects.get(codename='can_view_dataset')
+    # skip to fix it
+    try:
+        view_dataset_perm = Permission.objects.get(codename='view_dataset')
+        can_view_dataset_perm = Permission.objects.get(codename='can_view_dataset')
+    except Permission.DoesNotExist:
+        return
 
     # User - Permission
     for user in User.objects.filter(user_permissions=can_view_dataset_perm)\
