@@ -130,7 +130,7 @@ FIELDS['phonology'] = ['handedness', 'domhndsh', 'subhndsh', 'handCh', 'relatArt
                        'contType', 'movSh', 'movDir',
                        'repeat', 'altern',
                        'relOriMov', 'relOriLoc', 'oriCh',
-                       'locVirtObj', 'phonOth', 'mouthG', 'mouthing', 'phonetVar',
+                       'locVirtObj', 'phonOth', 'hamnosys', 'mouthG', 'mouthing', 'phonetVar',
                        'domhndsh_letter', 'domhndsh_number', 'subhndsh_letter', 'subhndsh_number',
                        'weakdrop', 'weakprop']
 

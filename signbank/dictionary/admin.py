@@ -42,7 +42,7 @@ from signbank.tools import (get_fields_with_choices_glosses, get_fields_with_cho
 class DatasetAdmin(GuardedModelAdmin):
     model = Dataset
     list_display = ('name', 'is_public', 'signlanguage',)
-    readonly_fields = ['acronym', 'default_language']
+    readonly_fields = ['default_language']
 
     def get_actions(self, request):
         actions = super().get_actions(request)

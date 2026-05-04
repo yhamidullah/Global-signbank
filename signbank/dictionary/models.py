@@ -1158,6 +1158,8 @@ class Gloss(MetaModelMixin, models.Model):
 
     phonOth = models.TextField(_("Phonology Other"), null=True, blank=True)
 
+    hamnosys = models.TextField(_("HamNoSys"), null=True, blank=True)
+
     mouthG = models.CharField(_("Mouth Gesture"), max_length=50, blank=True)
     mouthing = models.CharField(_("Mouthing"), max_length=50, blank=True)
     phonetVar = models.CharField(_("Phonetic Variation"), max_length=50, blank=True)
