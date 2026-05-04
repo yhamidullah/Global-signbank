@@ -227,8 +227,11 @@ def extension_on_filename(filename):
 def detect_video_file_extension(file_path):
     if not os.path.exists(file_path):
         return extension_on_filename(file_path)
-    filetype_output = subprocess.run(["file", "-b", file_path], stdout=subprocess.PIPE)
-    filetype = str(filetype_output.stdout)
+    try:
+        filetype_output = subprocess.run(["file", "-b", file_path], stdout=subprocess.PIPE)
+        filetype = str(filetype_output.stdout)
+    except FileNotFoundError:
+        return extension_on_filename(file_path)
     if 'MP4' in filetype:
         video_extension = '.mp4'
     elif 'MOV' in filetype:
@@ -254,8 +257,11 @@ def video_file_type_extension(video_file_full_path):
     if not os.path.exists(video_file_full_path):
         return extension_on_filename(video_file_full_path)
 
-    filetype_output = subprocess.run(["file", "-b", video_file_full_path], stdout=subprocess.PIPE)
-    filetype = str(filetype_output.stdout)
+    try:
+        filetype_output = subprocess.run(["file", "-b", video_file_full_path], stdout=subprocess.PIPE)
+        filetype = str(filetype_output.stdout)
+    except FileNotFoundError:
+        return extension_on_filename(video_file_full_path)
     if 'MP4' in filetype:
         desired_video_extension = '.mp4'
     elif 'MOV' in filetype:
