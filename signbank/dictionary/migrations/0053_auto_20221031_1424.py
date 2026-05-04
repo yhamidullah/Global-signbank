@@ -17,8 +17,8 @@ def copy_semanticfield_names_to_translations(apps, schema_editor):
     SemanticFieldTranslation = apps.get_model('dictionary', 'SemanticFieldTranslation')
     Language = apps.get_model('dictionary', 'Language')
     translation_language_eng = Language.objects.get(language_code_3char='eng')
-    translation_language_nld = Language.objects.get(language_code_3char='nld')
-    translation_language_zho = Language.objects.get(language_code_3char='zho')
+    # translation_language_nld = Language.objects.get(language_code_3char='nld')
+    # translation_language_zho = Language.objects.get(language_code_3char='zho')
     semanticfields = SemanticField.objects.filter(machine_value__gt=1)
     for semfield in semanticfields:
         translations_for_semfield = [sft.language for sft in SemanticFieldTranslation.objects.filter(semField=semfield)]
@@ -28,18 +28,18 @@ def copy_semanticfield_names_to_translations(apps, schema_editor):
                                                         language=translation_language_eng,
                                                         name=semfield.name_en)
             semanticfieldtranslation_eng.save()
-        if semfield.name_nl and translation_language_nld not in translations_for_semfield:
-            semanticfieldtranslation_nld, created = SemanticFieldTranslation.objects.get_or_create(
-                                                        semField=semfield,
-                                                        language=translation_language_nld,
-                                                        name=semfield.name_nl)
-            semanticfieldtranslation_nld.save()
-        if semfield.name_zh_hans and translation_language_zho not in translations_for_semfield:
-            semanticfieldtranslation_zho, created = SemanticFieldTranslation.objects.get_or_create(
-                                                        semField=semfield,
-                                                        language=translation_language_zho,
-                                                        name=semfield.name_zh_hans)
-            semanticfieldtranslation_zho.save()
+        #if semfield.name_nl and translation_language_nld not in translations_for_semfield:
+        #    semanticfieldtranslation_nld, created = SemanticFieldTranslation.objects.get_or_create(
+        #                                                semField=semfield,
+        #                                                language=translation_language_nld,
+        #                                                name=semfield.name_nl)
+        #    semanticfieldtranslation_nld.save()
+        #if semfield.name_zh_hans and translation_language_zho not in translations_for_semfield:
+        #    semanticfieldtranslation_zho, created = SemanticFieldTranslation.objects.get_or_create(
+        #                                                semField=semfield,
+        #                                                language=translation_language_zho,
+        #                                                name=semfield.name_zh_hans)
+        #    semanticfieldtranslation_zho.save()
 
 def copy_derivationhistory_names_to_translations(apps, schema_editor):
     """
@@ -52,8 +52,8 @@ def copy_derivationhistory_names_to_translations(apps, schema_editor):
     DerivationHistoryTranslation = apps.get_model('dictionary', 'DerivationHistoryTranslation')
     Language = apps.get_model('dictionary', 'Language')
     translation_language_eng = Language.objects.get(language_code_3char='eng')
-    translation_language_nld = Language.objects.get(language_code_3char='nld')
-    translation_language_zho = Language.objects.get(language_code_3char='zho')
+    #translation_language_nld = Language.objects.get(language_code_3char='nld')
+    #translation_language_zho = Language.objects.get(language_code_3char='zho')
     derivationhistories = DerivationHistory.objects.all()
     for derivhist in derivationhistories:
         translations_for_derivhist = [dht.language for dht in DerivationHistoryTranslation.objects.filter(derivHist=derivhist)]
@@ -63,18 +63,18 @@ def copy_derivationhistory_names_to_translations(apps, schema_editor):
                                                         language=translation_language_eng,
                                                         name=derivhist.name_en)
             derivationhistorytranslation_eng.save()
-        if derivhist.name_nl and translation_language_nld not in translations_for_derivhist:
-            derivationhistorytranslation_nld, created = DerivationHistoryTranslation.objects.get_or_create(
-                                                        derivHist=derivhist,
-                                                        language=translation_language_nld,
-                                                        name=derivhist.name_nl)
-            derivationhistorytranslation_nld.save()
-        if derivhist.name_zh_hans and translation_language_zho not in translations_for_derivhist:
-            derivationhistorytranslation_zho, created = DerivationHistoryTranslation.objects.get_or_create(
-                                                        derivHist=derivhist,
-                                                        language=translation_language_zho,
-                                                        name=derivhist.name_zh_hans)
-            derivationhistorytranslation_zho.save()
+        #if derivhist.name_nl and translation_language_nld not in translations_for_derivhist:
+        #    derivationhistorytranslation_nld, created = DerivationHistoryTranslation.objects.get_or_create(
+        #                                                derivHist=derivhist,
+        #                                                language=translation_language_nld,
+        #                                                name=derivhist.name_nl)
+        #    derivationhistorytranslation_nld.save()
+        #if derivhist.name_zh_hans and translation_language_zho not in translations_for_derivhist:
+        #    derivationhistorytranslation_zho, created = DerivationHistoryTranslation.objects.get_or_create(
+        #                                                derivHist=derivhist,
+        #                                                language=translation_language_zho,
+        #                                                name=derivhist.name_zh_hans)
+        #    derivationhistorytranslation_zho.save()
 
 class Migration(migrations.Migration):
 

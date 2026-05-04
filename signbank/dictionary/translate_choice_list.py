@@ -30,7 +30,7 @@ def choicelist_queryset_to_translated_dict(queryset, ordered=True, id_prefix='_'
         machine_values_seen.append(choice.machine_value)
         raw_choice_list.append((id_prefix + str(choice.machine_value), choice.name))
 
-    list_head = [] if shortlist else [(id_prefix + str(empty_or_NA[v].machine_value), v) for v in list_head_values]
+    list_head = [] if shortlist else [(id_prefix + str(empty_or_NA[v].machine_value), v) for v in list_head_values if v in empty_or_NA]
 
     if ordered:
         sorted_choice_list = OrderedDict(list_head)
@@ -73,7 +73,7 @@ def choicelist_queryset_to_colors(queryset, ordered=True, id_prefix='_',
         if field_color[0] == '#':
             field_color = field_color[1:]
         raw_choice_list.append((id_prefix + str(choice.machine_value), human_value, field_color))
-    list_head = [] if shortlist else [(id_prefix + str(empty_or_NA[v].machine_value), v, 'ffffff') for v in list_head_values]
+    list_head = [] if shortlist else [(id_prefix + str(empty_or_NA[v].machine_value), v, 'ffffff') for v in list_head_values if v in empty_or_NA]
 
     if ordered:
         # sort by human value

@@ -4,21 +4,6 @@ from django.core.management.base import BaseCommand, CommandError
 from signbank.dictionary.models import Gloss
 from django.contrib.auth.models import User, Group, Permission
 
-change_gloss = Permission.objects.get(codename='change_gloss', content_type__model__exact='gloss')
-advanced_search = Permission.objects.get(codename='search_gloss', content_type__model__exact='gloss')
-view_adv_properties = Permission.objects.get(codename='view_advanced_properties', content_type__model__exact='gloss')
-export_csv = Permission.objects.get(codename='export_csv', content_type__model__exact='gloss')
-export_ecv = Permission.objects.get(codename='export_ecv', content_type__model__exact='gloss')
-add_video = Permission.objects.get(codename='update_video', content_type__model__exact='gloss')
-create_signs = Permission.objects.get(codename='add_gloss', content_type__model__exact='gloss')
-publish = Permission.objects.get(codename='can_publish', content_type__model__exact='gloss')
-delete_unpublished = Permission.objects.get(codename='can_delete_unpublished', content_type__model__exact='gloss')
-delete_published = Permission.objects.get(codename='can_delete_published', content_type__model__exact='gloss')
-delete_gen_feedback = Permission.objects.get(codename='delete_generalfeedback', content_type__model__exact='generalfeedback')
-change_page = Permission.objects.get(codename='change_page', content_type__model__exact='page')
-add_page = Permission.objects.get(codename='add_page', content_type__model__exact='page')
-add_attachment = Permission.objects.get(codename='add_attachment', content_type__app_label__exact='attachments')
-
 
 
 class Command(BaseCommand):
@@ -27,8 +12,23 @@ class Command(BaseCommand):
     args = ''
 
     def handle(self, *args, **options):
-
-        
+            try:
+                 change_gloss = Permission.objects.get(codename='change_gloss', content_type__model__exact='gloss')
+                 advanced_search = Permission.objects.get(codename='search_gloss', content_type__model__exact='gloss')
+                 view_adv_properties = Permission.objects.get(codename='view_advanced_properties', content_type__model__exact='gloss')
+                 export_csv = Permission.objects.get(codename='export_csv', content_type__model__exact='gloss')
+                 export_ecv = Permission.objects.get(codename='export_ecv', content_type__model__exact='gloss')
+                 add_video = Permission.objects.get(codename='update_video', content_type__model__exact='gloss')
+                 create_signs = Permission.objects.get(codename='add_gloss', content_type__model__exact='gloss')
+                 publish = Permission.objects.get(codename='can_publish', content_type__model__exact='gloss')
+                 delete_unpublished = Permission.objects.get(codename='can_delete_unpublished', content_type__model__exact='gloss')
+                 delete_published = Permission.objects.get(codename='can_delete_published', content_type__model__exact='gloss')
+                 delete_gen_feedback = Permission.objects.get(codename='delete_generalfeedback', content_type__model__exact='generalfeedback')
+                 change_page = Permission.objects.get(codename='change_page', content_type__model__exact='page')
+                 add_page = Permission.objects.get(codename='add_page', content_type__model__exact='page')
+                 add_attachment = Permission.objects.get(codename='add_attachment', content_type__model__exact='attachment')
+            except Permission.DoesNotExist as e:
+                 raise CommandError(f'Permission not found: {e}. Run migrate first.')
             # Publisher
             publisher, created = Group.objects.get_or_create(name='Publisher')
             publisher.permissions.add(advanced_search)
