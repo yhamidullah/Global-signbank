@@ -10,7 +10,7 @@ def choicelist_queryset_to_translated_dict(queryset, ordered=True, id_prefix='_'
     # Make sure the machine values are unique by only using the first human value
 
     if not queryset:
-        return []
+        return OrderedDict() if ordered else []
 
     list_head_values = ['-', 'N/A']
 
