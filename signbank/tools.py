@@ -1995,13 +1995,71 @@ def write_ecv_file_for_dataset(dataset_name):
     ordered += list(qs_special.order_by(sOrder))
     ordered += list(qs_empty)
 
+    nma_categories = [
+        {
+            'cv_id': 'Augenbrauen',
+            'description_de': 'Augenbrauen (Eyebrows)',
+            'description_en': 'Eyebrows',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMAEYEBROWS).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Augenlider',
+            'description_de': 'Augenlider (Eyelids)',
+            'description_en': 'Eyelids',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMAEYELIDS).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Blick',
+            'description_de': 'Blick (Gaze)',
+            'description_en': 'Gaze / Eye direction',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMAGAZE).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Kopf',
+            'description_de': 'Kopf (Head movement)',
+            'description_en': 'Head movement',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMAHEAD).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Mundform',
+            'description_de': 'Mundform (Mouth gesture)',
+            'description_en': 'Mouth gesture / Mouth form',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMAMOUTHGESTURE).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'NMK',
+            'description_de': 'Nicht-manuelle Komponenten',
+            'description_en': 'Non-manual components',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMANK).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Nase',
+            'description_de': 'Nase (Nose)',
+            'description_en': 'Nose',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMANOSE).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Rumpf',
+            'description_de': 'Rumpf (Torso)',
+            'description_en': 'Torso / Body',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMATORSO).order_by('machine_value')),
+        },
+        {
+            'cv_id': 'Schultern',
+            'description_de': 'Schultern (Shoulders)',
+            'description_en': 'Shoulders',
+            'entries': list(FieldChoice.objects.filter(field=FieldChoice.NMASHOULDERS).order_by('machine_value')),
+        },
+    ]
+
     context = {
         'CV_ID': ECV_SETTINGS['CV_ID'] if 'CV_ID' in ECV_SETTINGS else "",
         'date': str(DT.date.today()) + 'T' + str(DT.datetime.now().time()),
         'glosses': ordered,
         'dataset': dataset_id,
         'languages': dataset_id.translation_languages.all(),
-        'resource_url': URL + PREFIX_URL + '/dictionary/gloss/'
+        'resource_url': URL + PREFIX_URL + '/dictionary/gloss/',
+        'nma_categories': nma_categories,
     }
     ecv_template = get_template('dictionary/ecv.xml')
     xmlstr = ecv_template.render(context)

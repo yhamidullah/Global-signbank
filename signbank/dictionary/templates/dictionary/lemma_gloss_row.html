@@ -31,7 +31,7 @@
     {% endfor %}
 
     {% for field,value in column_values %}
-    <td>{{value}}</td>
+    <td{% if field == 'hamnosys' %} style="font-family:'HamNoSys','HamNoSysUnicode','Hamnosysunicode',monospace;font-size:1.4em;"{% endif %}>{{value}}</td>
     {% endfor %}
 
     {% if not user.is_anonymous %}

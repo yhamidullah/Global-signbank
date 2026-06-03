@@ -124,6 +124,7 @@ urlpatterns = [
     re_path(r'^datasets/recent_feedback$', signbank.feedback.views.recent_feedback),
     re_path(r'^datasets/select', DatasetListView.as_view(), {'select': True}, name='admin_dataset_select'),
     re_path(r'^datasets/change_selection', signbank.dictionary.update.change_dataset_selection, name='change_dataset_selection'),
+    re_path(r'^datasets/switch/(?P<acronym>[^/]+)/$', signbank.dictionary.update.switch_dataset, name='switch_dataset'),
     re_path(r'^datasets/unassigned_glosses', signbank.dictionary.views.show_unassigned_glosses, name="show_unassigned_glosses"),
     re_path(r'^datasets/show_glosses_with_no_lemma', signbank.dictionary.views.show_glosses_with_no_lemma, name="show_glosses_with_no_lemma"),
     re_path(r'^datasets/manage_media/(?P<pk>\d+)$', login_required(DatasetMediaView.as_view()), name='admin_dataset_media'),
@@ -145,4 +146,7 @@ urlpatterns = [
     re_path(r'^update/dataset_eafs/', signbank.dictionary.update.upload_eaf_files, name='upload_eaf_files'),
     re_path(r'^update/remove_eaf_files/', signbank.dictionary.update.remove_eaf_files, name='remove_eaf_files'),
     re_path(r'^update/expiry/', signbank.dictionary.update.update_expiry, name='update_expiry'),
+
+    # CMS catch-all: must be last so it only fires for paths with no other match
+    re_path(r'^(?P<url>.*)$', signbank.pages.views.page),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

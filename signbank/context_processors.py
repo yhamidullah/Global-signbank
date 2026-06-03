@@ -2,7 +2,7 @@ from django.conf import settings
 from guardian.shortcuts import get_objects_for_user, get_user_perms
 from signbank.dictionary.context_data import get_selected_datasets
 from signbank.tools import get_datasets_with_public_glosses
-from signbank.dictionary.models import Dataset
+from signbank.dictionary.models import Dataset, HeaderConfig
 
 
 def url(request):
@@ -35,6 +35,8 @@ def url(request):
         request.session['dark_mode'] = "False"
         request.session.modified = True
 
+    header_config = HeaderConfig.get_config()
+
     return {'URL': settings.URL,
             'PREFIX_URL': settings.PREFIX_URL,
             'viewable_datasets': [(dataset, dataset in selected_datasets) for dataset in viewable_datasets],
@@ -45,5 +47,6 @@ def url(request):
             'INTERFACE_LANGUAGE_CODES': [language_code for language_code, full_name in settings.LANGUAGES],
             'INTERFACE_LANGUAGE_SHORT_NAMES': settings.INTERFACE_LANGUAGE_SHORT_NAMES,
             'SELECT2_JS': settings.SELECT2_JS,
-            'SELECT2_CSS': settings.SELECT2_CSS
+            'SELECT2_CSS': settings.SELECT2_CSS,
+            'header_config': header_config,
             }

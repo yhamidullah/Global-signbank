@@ -1,0 +1,404 @@
+/* =====================================================================
+   Aurora — Animated Gradient Glassmorphism Header Theme
+   Default palette (via --sb-* custom properties from HeaderConfig):
+     --sb-primary:      #4f46e5  (indigo – gradient start)
+     --sb-accent:       #06b6d4  (cyan   – gradient end / glow)
+     --sb-primary-text: #ffffff
+     --sb-inst-bar-bg:  #3730a3  (deep indigo – used in gradient)
+   ===================================================================== */
+
+/* ── Animated gradient keyframes ─────────────────────────────────── */
+@keyframes aurora-shift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+@keyframes aurora-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.04); }
+}
+
+/* ── Body / bar reset ────────────────────────────────────────────── */
+body.theme-aurora {
+  padding-top: 0 !important;
+}
+
+body.theme-aurora #signbank-bar {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+/* ── Wrapper — holds both bars, owns the animated gradient ────────── */
+body.theme-aurora .aur-wrapper {
+  position: relative;
+  background: linear-gradient(
+    -45deg,
+    var(--sb-primary,      #4f46e5),
+    var(--sb-inst-bar-bg,  #3730a3),
+    color-mix(in srgb, var(--sb-primary, #4f46e5) 40%, var(--sb-accent, #06b6d4)),
+    var(--sb-accent,       #06b6d4),
+    color-mix(in srgb, var(--sb-accent,  #06b6d4) 60%, #7c3aed),
+    #7c3aed,
+    var(--sb-primary,      #4f46e5)
+  );
+  background-size: 400% 400%;
+  animation: aurora-shift 14s ease infinite;
+  overflow: hidden;
+}
+
+/* Subtle light-streak overlay */
+body.theme-aurora .aur-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 20% -10%, rgba(255,255,255,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 110%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 1. Main bar ─────────────────────────────────────────────────── */
+body.theme-aurora .aur-main-bar {
+  position: relative;
+  z-index: 1;
+  padding: 0 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.theme-aurora .aur-main-inner {
+  display: flex;
+  align-items: center;
+  min-height: 62px;
+  gap: 20px;
+}
+
+/* ── Logo ── */
+body.theme-aurora .aur-brand a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none !important;
+  flex-shrink: 0;
+}
+
+body.theme-aurora .aur-logo-mark {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+body.theme-aurora .aur-logo-mark svg {
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+  animation: aurora-glow-pulse 4s ease-in-out infinite;
+}
+
+body.theme-aurora .aur-title-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+body.theme-aurora .aur-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.4px;
+  text-shadow: 0 1px 12px rgba(255,255,255,0.3);
+}
+
+body.theme-aurora .aur-subtitle {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* ── Search ── */
+body.theme-aurora .aur-search-wrap {
+  flex: 1;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+body.theme-aurora .aur-search-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body.theme-aurora .aur-search-pill:focus-within {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.15),
+    0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+body.theme-aurora .aur-search-icon {
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+body.theme-aurora .aur-search-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
+  color: #fff !important;
+  font-size: 14px;
+  width: 100%;
+  padding: 0;
+}
+
+body.theme-aurora .aur-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Right section ── */
+body.theme-aurora .aur-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Dataset chips */
+body.theme-aurora .aur-datasets {
+  display: flex;
+  gap: 7px;
+}
+
+body.theme-aurora .aur-chip {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+body.theme-aurora .aur-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+body.theme-aurora .aur-chip--active {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #fff;
+  font-weight: 700;
+  box-shadow:
+    0 0 14px rgba(255, 255, 255, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Divider */
+body.theme-aurora .aur-vdivider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+/* User links */
+body.theme-aurora .aur-user-link {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  text-decoration: none !important;
+  transition: color 0.12s;
+  white-space: nowrap;
+}
+body.theme-aurora .aur-user-link:hover { color: #fff; }
+
+body.theme-aurora .aur-dark-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.12s;
+}
+body.theme-aurora .aur-dark-btn:hover { color: #fff; }
+
+/* ── 2. Frosted glass nav strip ───────────────────────────────────── */
+body.theme-aurora .aur-nav-strip {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+}
+
+body.theme-aurora .aur-nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+  flex: 1;
+}
+
+body.theme-aurora .aur-nav-item {
+  position: relative;
+}
+
+body.theme-aurora .aur-nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 13px;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+body.theme-aurora .aur-nav-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+body.theme-aurora .aur-nav-caret {
+  font-size: 8px;
+  opacity: 0.55;
+  transition: transform 0.15s;
+}
+
+body.theme-aurora .aur-has-dropdown:hover .aur-nav-caret {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+body.theme-aurora .aur-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  min-width: 190px;
+  z-index: 2000;
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255,255,255,0.08) inset;
+  overflow: hidden;
+}
+
+body.theme-aurora .aur-has-dropdown:hover .aur-dropdown {
+  display: block;
+}
+
+body.theme-aurora .aur-dropdown li a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  text-decoration: none !important;
+  transition: background 0.12s, color 0.12s;
+}
+
+body.theme-aurora .aur-dropdown li a:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Attribution */
+body.theme-aurora .aur-attribution {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+body.theme-aurora .aur-attr-diamond {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  animation: aurora-glow-pulse 3s ease-in-out infinite;
+}
+
+body.theme-aurora .aur-attr-text {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Bottom accent line ───────────────────────────────────────────── */
+body.theme-aurora .aur-accent-line {
+  height: 2px;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.2) 10%,
+    rgba(255,255,255,0.6) 30%,
+    rgba(255,255,255,0.9) 50%,
+    rgba(255,255,255,0.6) 70%,
+    rgba(255,255,255,0.2) 90%,
+    transparent 100%
+  );
+}
+
+/* ── Dark mode — already dark-gradient, minor saturation boost ─────── */
+body.theme-aurora.body-dark .aur-wrapper {
+  filter: saturate(0.85) brightness(0.9);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  body.theme-aurora .aur-datasets { display: none; }
+  body.theme-aurora .aur-subtitle { display: none; }
+}
+
+@media (max-width: 700px) {
+  body.theme-aurora .aur-search-wrap { max-width: 200px; }
+  body.theme-aurora .aur-attribution { display: none; }
+}
+
+@media (max-width: 500px) {
+  body.theme-aurora .aur-search-wrap { display: none; }
+}

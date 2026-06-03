@@ -6,9 +6,9 @@ from signbank.settings.base import DISABLE_MOVING_THUMBNAILS_ABOVE_NR_OF_GLOSSES
 from signbank.settings.server_specific import (FIELDS, HANDSHAPE_ETYMOLOGY_FIELDS, HANDEDNESS_ARTICULATION_FIELDS,
                                                SEARCH_BY, USE_DERIVATIONHISTORY, LANGUAGE_CODE, DEFAULT_DATASET_ACRONYM,
                                                SHOW_DATASET_INTERFACE_OPTIONS, USE_REGULAR_EXPRESSIONS,
-                                               SHOW_MORPHEME_SEARCH, GLOSS_LIST_DISPLAY_FIELDS)
+                                               SHOW_MORPHEME_SEARCH)
 from signbank.dictionary.models import (Dataset, Gloss, Morpheme, SignLanguage, Dialect,
-                                        FieldChoice, CATEGORY_MODELS_MAPPING)
+                                        FieldChoice, CATEGORY_MODELS_MAPPING, GlossListConfig)
 from signbank.dictionary.forms import GlossSearchForm, GlossCreateForm, LemmaCreateForm
 from signbank.tools import get_selected_datasets_for_user, get_dataset_languages, searchform_panels
 
@@ -68,8 +68,9 @@ def get_context_data_for_list_view(request, listview, kwargs, context={}):
     context['js_dataset_languages'] = ','.join(dataset_languages_abbreviations)
 
     if not dataset_languages_abbreviations:
-        default_dataset = Dataset.objects.get(acronym=DEFAULT_DATASET_ACRONYM)
-        dataset_languages_abbreviations = [default_dataset.default_language.language_code_2char]
+        default_dataset = Dataset.objects.filter(acronym=DEFAULT_DATASET_ACRONYM).first()
+        if default_dataset and default_dataset.default_language:
+            dataset_languages_abbreviations = [default_dataset.default_language.language_code_2char]
     context['queryset_language_codes'] = dataset_languages_abbreviations
 
     last_used_dataset = request.session.get('last_used_dataset', None)
@@ -189,7 +190,7 @@ def get_context_data_for_gloss_search_form(request, listview, search_form, kwarg
 
     if listview.model == Gloss:
         context['SHOW_MORPHEME_SEARCH'] = SHOW_MORPHEME_SEARCH if request.user.is_authenticated else False
-        context['GLOSS_LIST_DISPLAY_HEADER'] = GLOSS_LIST_DISPLAY_FIELDS if request.user.is_authenticated else []
+        context['GLOSS_LIST_DISPLAY_HEADER'] = GlossListConfig.get_display_fields() if request.user.is_authenticated else []
 
         if 'relations' in SEARCH_BY.keys() and request.user.is_authenticated:
             context['search_by_relation_fields'] = searchform_panels(search_form, SEARCH_BY['relations'])

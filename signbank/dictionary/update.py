@@ -2957,6 +2957,30 @@ def change_dataset_selection(request):
     return redirect(PREFIX_URL + '/datasets/select')
 
 
+def switch_dataset(request, acronym):
+    """Exclusively select one dataset from the header ribbon and redirect to search."""
+    try:
+        dataset = Dataset.objects.get(acronym=acronym)
+    except Dataset.DoesNotExist:
+        return redirect(PREFIX_URL + '/signs/search/')
+
+    if not dataset.is_public and not request.user.is_authenticated:
+        return redirect(PREFIX_URL + '/accounts/login/')
+
+    if request.user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile.selected_datasets.set([dataset])
+        user_profile.save()
+    else:
+        request.session['selected_datasets'] = [acronym]
+        request.session['search_results'] = []
+        request.session.modified = True
+
+    request.session['last_used_dataset'] = acronym
+    request.session.modified = True
+    return redirect(PREFIX_URL + '/signs/search/')
+
+
 def check_permissions_dataset_update(request, dataset):
 
     if not request.user.is_authenticated:

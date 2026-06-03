@@ -21,4 +21,15 @@
        <EXTERNAL_REF EXT_REF_ID="er{{ gloss.id }}" TYPE="resource_url" VALUE="{{ resource_url }}{{ gloss.id }}"/>
        {% endfor %}
    </CONTROLLED_VOCABULARY>
+   {% for nma in nma_categories %}
+   <CONTROLLED_VOCABULARY CV_ID="{{ nma.cv_id }}">
+       <DESCRIPTION LANG_REF="deu">{{ nma.description_de }}</DESCRIPTION>
+       <DESCRIPTION LANG_REF="eng">{{ nma.description_en }}</DESCRIPTION>
+       {% for entry in nma.entries %}
+       <CV_ENTRY_ML CVE_ID="nma_{{ nma.cv_id }}_{{ entry.machine_value }}">
+           <CVE_VALUE LANG_REF="deu">{{ entry.name }}</CVE_VALUE>
+       </CV_ENTRY_ML>
+       {% endfor %}
+   </CONTROLLED_VOCABULARY>
+   {% endfor %}
 </CV_RESOURCE>

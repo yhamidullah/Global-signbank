@@ -30,7 +30,8 @@ from signbank.dictionary.models import (Dataset, Gloss, Translation, LemmaIdglos
                                         SearchHistory,
                                         QueryParameterMultilingual,  QueryParameterSemanticField,
                                         QueryParameterDerivationHistory,
-                                        QueryParameterBoolean, QueryParameterFieldChoice, QueryParameterHandshape)
+                                        QueryParameterBoolean, QueryParameterFieldChoice, QueryParameterHandshape,
+                                        GlossListConfig, HeaderConfig)
 from signbank.dictionary.forms import (FieldChoiceForm, SemanticFieldForm, HandshapeForm,
                                        QueryParameterFieldChoiceForm, SearchHistoryForm, QueryParameterBooleanForm,
                                        QueryParameterMultilingualForm, QueryParameterHandshapeForm)
@@ -1501,3 +1502,182 @@ admin.site.register(ExampleSentence, ExampleSentenceAdmin)
 admin.site.register(ExampleSentenceTranslation, ExampleSentenceTranslationAdmin)
 admin.site.register(AnnotatedSentenceSource, AnnotatedSentenceSourceAdmin)
 admin.site.register(AnnotatedSentenceTranslation, AnnotatedSentenceTranslationAdmin)
+
+
+# ---------------------------------------------------------------------------
+# GlossListConfig — singleton admin for choosing search-result columns
+# ---------------------------------------------------------------------------
+
+_GLOSS_LIST_FIELD_CHOICES = [
+    # Phonology – text fields
+    ('hamnosys',  'HamNoSys'),
+    ('mouthing',  'Mouthing'),
+    ('mouthG',    'Mouth Gesture'),
+    ('phonOth',   'Other Phonology'),
+    ('locVirtObj','Virtual Object Location'),
+    ('phonetVar', 'Phonetic Variation'),
+    # Phonology – FieldChoice fields
+    ('handedness',  'Handedness'),
+    ('domhndsh',    'Strong Hand'),
+    ('subhndsh',    'Weak Hand'),
+    ('handCh',      'Hand Change'),
+    ('relatArtic',  'Relative Articulation'),
+    ('locprim',     'Location'),
+    ('contType',    'Contact Type'),
+    ('movSh',       'Movement Shape'),
+    ('movDir',      'Movement Direction'),
+    ('repeat',      'Repeated Movement'),
+    ('altern',      'Alternating Movement'),
+    ('relOriMov',   'Relative Orientation of Movement'),
+    ('relOriLoc',   'Relative Orientation of Location'),
+    ('oriCh',       'Orientation Change'),
+    ('weakdrop',    'Weak Drop'),
+    ('weakprop',    'Weak Prop'),
+    # Semantics
+    ('semField',    'Semantic Field'),
+    ('namEnt',      'Named Entity'),
+    ('iconImg',     'Iconic Image'),
+    ('derivHist',   'Derivation History'),
+    ('valence',     'Valence'),
+]
+
+
+class GlossListConfigForm(forms.ModelForm):
+    display_fields = forms.MultipleChoiceField(
+        choices=_GLOSS_LIST_FIELD_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Columns to display in search results (order follows the list above)",
+        help_text="Tick the fields you want to appear as extra columns in the gloss search results list.",
+    )
+
+    class Meta:
+        model = GlossListConfig
+        fields = ['display_fields']
+
+    def clean_display_fields(self):
+        valid = {k for k, _ in _GLOSS_LIST_FIELD_CHOICES}
+        return [f for f in self.cleaned_data['display_fields'] if f in valid]
+
+
+@admin.register(GlossListConfig)
+class GlossListConfigAdmin(admin.ModelAdmin):
+    form = GlossListConfigForm
+
+    def has_add_permission(self, request):
+        return not GlossListConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        obj, _ = GlossListConfig.objects.get_or_create(pk=1)
+        from django.shortcuts import redirect
+        from django.urls import reverse
+        return redirect(reverse('admin:dictionary_glosslistconfig_change', args=[obj.pk]))
+
+
+# ---------------------------------------------------------------------------
+# HeaderConfig — admin for switching the site header theme
+# ---------------------------------------------------------------------------
+
+class ColorInput(forms.TextInput):
+    """Renders an HTML color-picker input."""
+    input_type = 'color'
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('attrs', {})
+        kwargs['attrs'].setdefault('style', 'width:60px;height:36px;padding:2px;cursor:pointer;border:1px solid #ccc;border-radius:4px;')
+        super().__init__(*args, **kwargs)
+
+
+class HeaderConfigForm(forms.ModelForm):
+    theme = forms.ChoiceField(
+        choices=HeaderConfig.THEME_CHOICES,
+        widget=forms.RadioSelect,
+        label='Header theme',
+    )
+
+    class Meta:
+        model = HeaderConfig
+        fields = [
+            'theme',
+            'logo', 'favicon',
+            'site_title', 'institution_name', 'department_name',
+            'color_primary', 'color_primary_text', 'color_accent', 'color_inst_bar_bg',
+        ]
+        widgets = {
+            'site_title': forms.TextInput(attrs={'style': 'width:400px'}),
+            'institution_name': forms.TextInput(attrs={'style': 'width:400px'}),
+            'department_name': forms.TextInput(attrs={'style': 'width:400px'}),
+            'color_primary': ColorInput(),
+            'color_primary_text': ColorInput(),
+            'color_accent': ColorInput(),
+            'color_inst_bar_bg': ColorInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            resolved = self.instance.get_resolved_colors()
+            for field_name, color in resolved.items():
+                if field_name in self.fields and color and not getattr(self.instance, field_name, ''):
+                    self.initial[field_name] = color
+
+    def clean_color_primary(self):
+        return self._clean_hex(self.cleaned_data.get('color_primary', ''))
+
+    def clean_color_primary_text(self):
+        return self._clean_hex(self.cleaned_data.get('color_primary_text', ''))
+
+    def clean_color_accent(self):
+        return self._clean_hex(self.cleaned_data.get('color_accent', ''))
+
+    def clean_color_inst_bar_bg(self):
+        return self._clean_hex(self.cleaned_data.get('color_inst_bar_bg', ''))
+
+    @staticmethod
+    def _clean_hex(value):
+        import re
+        value = (value or '').strip()
+        if value and not re.match(r'^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$', value):
+            raise forms.ValidationError('Enter a valid hex color, e.g. #0028a5')
+        return value
+
+
+@admin.register(HeaderConfig)
+class HeaderConfigAdmin(admin.ModelAdmin):
+    form = HeaderConfigForm
+    fieldsets = [
+        ('Theme', {'fields': ['theme']}),
+        ('Logo & Favicon', {'fields': ['logo', 'favicon']}),
+        ('Branding Text (UZH theme)', {
+            'fields': ['site_title', 'institution_name', 'department_name'],
+            'classes': ['collapse'],
+        }),
+        ('Colors (leave blank to use theme defaults)', {
+            'fields': ['color_primary', 'color_primary_text', 'color_accent', 'color_inst_bar_bg'],
+            'description': (
+                '<strong>UZH defaults:</strong> Primary #0028a5 · Text #ffffff · Accent #0028a5 · Inst.bar #f0f2f7<br>'
+                '<strong>Frost defaults:</strong> Primary #0f172a · Text #f1f5f9 · Accent #3b82f6 · Nav strip #0d1117<br>'
+                '<strong>Aurora defaults:</strong> Primary #4f46e5 · Text #ffffff · Accent #06b6d4 · Inst.bar #3730a3<br>'
+                'Leave fields blank to use the theme\'s built-in defaults.'
+            ),
+            'classes': ['collapse'],
+        }),
+    ]
+
+    class Media:
+        js = ['js/header_config_admin.js']
+
+    def has_add_permission(self, request):
+        return not HeaderConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        obj, _ = HeaderConfig.objects.get_or_create(pk=1)
+        from django.shortcuts import redirect
+        from django.urls import reverse
+        return redirect(reverse('admin:dictionary_headerconfig_change', args=[obj.pk]))

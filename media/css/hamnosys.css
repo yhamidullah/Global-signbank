@@ -1,0 +1,19 @@
+@font-face {
+  font-family: 'HamNoSys';
+  src: local('HamNoSysUnicode'), local('Hamnosysunicode'), local('HamNoSys Unicode'),
+       url('/static/fonts/HamNoSysUnicode.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+td.hamnosys,
+tr td.hamnosys,
+td.field_hamnosys,
+td#hamnosys,
+div#hamnosys,
+input[name="hamnosys"],
+textarea[name="hamnosys"] {
+  font-family: 'HamNoSys', 'HamNoSysUnicode', 'Hamnosysunicode', monospace !important;
+  font-size: 1.4em;
+}

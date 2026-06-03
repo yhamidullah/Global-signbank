@@ -1,0 +1,326 @@
+/* =====================================================================
+   UZH Computational Linguistics Header Theme
+   Default palette (overridable via CSS custom properties set in
+   baselayout.html from HeaderConfig):
+     --sb-primary:       #0028a5  (nav bar bg, badge, links)
+     --sb-primary-text:  #ffffff  (text/icons on primary bg)
+     --sb-accent:        #0028a5  (hover borders, dropdown tops)
+     --sb-inst-bar-bg:   #f0f2f7  (institutional strip bg)
+   ===================================================================== */
+
+/* ── Body theme class ─────────────────────────────────────────────── */
+body.theme-uzh {
+  padding-top: 0 !important;
+}
+
+body.theme-uzh #signbank-bar {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+/* ── 1. Institutional top stripe ──────────────────────────────────── */
+body.theme-uzh .uzh-institutional-bar {
+  background: var(--sb-inst-bar-bg, #f0f2f7);
+  border-bottom: 1px solid color-mix(in srgb, var(--sb-inst-bar-bg, #f0f2f7) 60%, #888);
+  padding: 7px 24px;
+}
+
+body.theme-uzh .uzh-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+body.theme-uzh .uzh-institution-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+body.theme-uzh .uzh-university {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sb-primary, #0028a5);
+  letter-spacing: 0.01em;
+}
+
+body.theme-uzh .uzh-department {
+  font-size: 10.5px;
+  color: #555;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ── 2. Main navigation bar ───────────────────────────────────────── */
+body.theme-uzh .uzh-nav-main {
+  background: var(--sb-primary, #0028a5);
+  padding: 0 24px;
+}
+
+body.theme-uzh .uzh-nav-inner {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  gap: 24px;
+}
+
+body.theme-uzh .uzh-brand a {
+  text-decoration: none !important;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+body.theme-uzh .uzh-signbank-name {
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--sb-primary-text, #ffffff);
+  letter-spacing: -0.2px;
+}
+
+body.theme-uzh .uzh-signbank-sub {
+  font-size: 9px;
+  color: color-mix(in srgb, var(--sb-primary-text, #ffffff) 60%, transparent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* Dataset chips */
+body.theme-uzh .uzh-dataset-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  padding: 0 8px;
+}
+
+body.theme-uzh .uzh-dataset-chip {
+  display: inline-block;
+  padding: 3px 13px;
+  border: 1.5px solid color-mix(in srgb, var(--sb-primary-text, #ffffff) 38%, transparent);
+  border-radius: 20px;
+  color: color-mix(in srgb, var(--sb-primary-text, #ffffff) 72%, transparent);
+  font-size: 12px;
+  text-decoration: none !important;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+  white-space: nowrap;
+}
+
+body.theme-uzh .uzh-dataset-chip:hover {
+  border-color: color-mix(in srgb, var(--sb-primary-text, #ffffff) 85%, transparent);
+  color: var(--sb-primary-text, #ffffff);
+  background: color-mix(in srgb, var(--sb-primary-text, #ffffff) 10%, transparent);
+}
+
+body.theme-uzh .uzh-dataset-chip--active {
+  border-color: var(--sb-primary-text, #ffffff);
+  color: var(--sb-primary-text, #ffffff);
+  background: color-mix(in srgb, var(--sb-primary-text, #ffffff) 18%, transparent);
+  font-weight: 600;
+}
+
+/* Right side actions */
+body.theme-uzh .uzh-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+body.theme-uzh .uzh-search-form {
+  display: flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--sb-primary-text, #ffffff) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sb-primary-text, #ffffff) 28%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+  padding: 0 8px;
+  height: 32px;
+}
+
+body.theme-uzh .uzh-search-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--sb-primary-text, #ffffff) !important;
+  outline: none;
+  padding: 4px 4px;
+  width: 170px;
+  font-size: 13px;
+}
+
+body.theme-uzh .uzh-search-input::placeholder {
+  color: color-mix(in srgb, var(--sb-primary-text, #ffffff) 50%, transparent);
+}
+
+body.theme-uzh .uzh-search-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  opacity: 0.72;
+  filter: brightness(10);
+}
+body.theme-uzh .uzh-search-btn:hover { opacity: 1; }
+
+body.theme-uzh .uzh-nav-link {
+  color: color-mix(in srgb, var(--sb-primary-text, #ffffff) 78%, transparent);
+  font-size: 13px;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+body.theme-uzh .uzh-nav-link:hover { color: var(--sb-primary-text, #ffffff); }
+
+body.theme-uzh .uzh-dark-toggle-main {
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── 3. Sub-menu navigation bar ───────────────────────────────────── */
+body.theme-uzh .uzh-nav-menu {
+  background: white;
+  border-bottom: 2.5px solid var(--sb-accent, var(--sb-primary, #0028a5));
+  padding: 0 24px;
+  position: relative;
+}
+
+body.theme-uzh .uzh-nav-menu-inner {
+  display: flex;
+  align-items: stretch;
+  min-height: 42px;
+}
+
+body.theme-uzh .uzh-menu-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+
+body.theme-uzh .uzh-menu-item {
+  position: relative;
+}
+
+body.theme-uzh .uzh-menu-link {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 100%;
+  color: #222;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none !important;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2.5px;
+  transition: color 0.13s, border-color 0.13s;
+  white-space: nowrap;
+}
+
+body.theme-uzh .uzh-menu-link:hover {
+  color: var(--sb-accent, var(--sb-primary, #0028a5));
+  border-bottom-color: var(--sb-accent, var(--sb-primary, #0028a5));
+}
+
+body.theme-uzh .uzh-caret {
+  font-size: 9px;
+  margin-left: 4px;
+  opacity: 0.55;
+}
+
+/* Dropdown */
+body.theme-uzh .uzh-dropdown .uzh-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2.5px);
+  left: 0;
+  background: white;
+  border: 1px solid #d0d5e8;
+  border-top: 2px solid var(--sb-accent, var(--sb-primary, #0028a5));
+  min-width: 190px;
+  z-index: 2000;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+}
+
+body.theme-uzh .uzh-dropdown:hover .uzh-dropdown-menu {
+  display: block;
+}
+
+body.theme-uzh .uzh-dropdown-menu li a {
+  display: block;
+  padding: 7px 18px;
+  color: #222;
+  font-size: 13px;
+  text-decoration: none !important;
+  transition: background 0.1s, color 0.1s;
+}
+
+body.theme-uzh .uzh-dropdown-menu li a:hover {
+  background: color-mix(in srgb, var(--sb-primary, #0028a5) 10%, white);
+  color: var(--sb-accent, var(--sb-primary, #0028a5));
+}
+
+body.theme-uzh .uzh-dark-toggle {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+/* ── Dark mode overrides ──────────────────────────────────────────── */
+body.theme-uzh.body-dark .uzh-institutional-bar {
+  background: #111827;
+  border-bottom-color: var(--sb-primary, #0028a5);
+}
+
+body.theme-uzh.body-dark .uzh-university {
+  color: color-mix(in srgb, var(--sb-primary, #0028a5) 60%, #fff);
+}
+body.theme-uzh.body-dark .uzh-department { color: #9ca3af; }
+
+body.theme-uzh.body-dark .uzh-nav-menu {
+  background: #1a1f2e;
+  border-bottom-color: color-mix(in srgb, var(--sb-primary, #0028a5) 70%, white);
+}
+
+body.theme-uzh.body-dark .uzh-menu-link { color: #d1d5db; }
+body.theme-uzh.body-dark .uzh-menu-link:hover {
+  color: color-mix(in srgb, var(--sb-primary, #0028a5) 50%, white);
+  border-bottom-color: color-mix(in srgb, var(--sb-primary, #0028a5) 50%, white);
+}
+
+body.theme-uzh.body-dark .uzh-dropdown .uzh-dropdown-menu {
+  background: #1a1f2e;
+  border-color: color-mix(in srgb, var(--sb-primary, #0028a5) 70%, white);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+body.theme-uzh.body-dark .uzh-dropdown-menu li a { color: #d1d5db; }
+body.theme-uzh.body-dark .uzh-dropdown-menu li a:hover {
+  background: color-mix(in srgb, var(--sb-primary, #0028a5) 25%, transparent);
+  color: color-mix(in srgb, var(--sb-primary, #0028a5) 50%, white);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  body.theme-uzh .uzh-dataset-selector { display: none; }
+  body.theme-uzh .uzh-search-input { width: 120px; }
+  body.theme-uzh .uzh-signbank-sub { display: none; }
+}
+
+@media (max-width: 600px) {
+  body.theme-uzh .uzh-nav-actions { gap: 10px; }
+  body.theme-uzh .uzh-search-form { display: none; }
+}

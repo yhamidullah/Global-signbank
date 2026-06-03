@@ -1,14 +1,373 @@
 {% load i18n %}
+{% load underscore_to_space %}
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/dark-mode-toggles.js"></script>
 
+{% if header_config.theme == "uzh" %}
+{# ================================================================== #}
+{# UZH COMPUTATIONAL LINGUISTICS THEME                                #}
+{# ================================================================== #}
+
 <style>
-#affix-bar.affix {
-    position:fixed;
-    top: 0;
-    z-index: 10 !important;
-    background: inherit;
-}
+#affix-bar.affix { position:fixed; top:0; z-index:10!important; background:inherit; }
+</style>
+
+<nav id="signbank-bar" class="navbar-fixed-top" style="box-sizing:content-box; z-index:1030;">
+
+  {# ── Institutional top stripe ── #}
+  <div class="uzh-institutional-bar">
+    <div class="uzh-wordmark">
+      <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
+           alt="Signbank Logo" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;">
+      <div class="uzh-institution-text">
+        <span class="uzh-university">{{ header_config.institution_name|default:"Universität Zürich" }}</span>
+        <span class="uzh-department">{{ header_config.department_name|default:"Institut für Computerlinguistik" }}</span>
+      </div>
+    </div>
+  </div>
+
+  {# ── Main nav bar (UZH Blue) ── #}
+  <div class="uzh-nav-main">
+    <div class="uzh-nav-inner">
+
+      {# Brand #}
+      <div class="uzh-brand">
+        <a href="{{PREFIX_URL}}/">
+          <span class="uzh-signbank-name">{% if header_config.site_title %}{{ header_config.site_title }}{% else %}Signbank{% endif %}</span>
+          <span class="uzh-signbank-sub">Sign Language Lexical Database</span>
+        </a>
+      </div>
+
+      {# Dataset chips #}
+      {% if SHOW_DATASET_INTERFACE_OPTIONS and viewable_datasets %}
+      <div class="uzh-dataset-selector">
+        {% for ds,selected in viewable_datasets %}
+        <a href="{{PREFIX_URL}}/datasets/switch/{{ds.acronym}}/"
+           class="uzh-dataset-chip {% if selected %}uzh-dataset-chip--active{% endif %}">
+          {{ds.generate_short_name|underscore_to_space}}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {# Search + user actions #}
+      <div class="uzh-nav-actions">
+        <form class="uzh-search-form" role="search" method="get" action="{{PREFIX_URL}}/signs/search/">
+          {% csrf_token %}
+          <input class="uzh-search-input" placeholder="{% trans "Search Gloss" %}" type="text"
+                 name="search" id="menubar-search" maxlength="60"
+                 onfocus="focusFunction()" onblur="blurFunction()" onclick="clickFunction()">
+          <button class="uzh-search-btn" type="submit">
+            <img src="{{ STATIC_URL }}images/global/search_icon.svg" height="15" alt="Search">
+          </button>
+        </form>
+
+        {% if user.is_authenticated %}
+          <a class="uzh-nav-link" href="{% url 'registration:user_profile' %}">{% trans "Profile" %}</a>
+          <a class="uzh-nav-link" href="{% url 'logout' %}">{% trans "Logout" %} ({{ user.first_name }})</a>
+        {% else %}
+          <a class="uzh-nav-link" href="{{PREFIX_URL}}/accounts/login/">{% trans "Login" %}</a>
+        {% endif %}
+
+        <div class="uzh-dark-toggle-main">
+          <button class="invisible_button" onclick="set_dark_mode()" title="Toggle dark mode">
+            <span class="glyphicon glyphicon-adjust" style="font-size:15px;color:rgba(255,255,255,0.7);"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Sub-menu nav bar (white + blue border) ── #}
+  <nav class="uzh-nav-menu">
+    <div class="uzh-nav-menu-inner">
+      <ul class="uzh-menu-list">
+        {% for item in menu %}
+          {% if item.children %}
+          <li class="uzh-menu-item uzh-dropdown">
+            <a href="{{PREFIX_URL}}{{item.url}}" class="uzh-menu-link">
+              {{item.title}}<span class="uzh-caret">▾</span>
+            </a>
+            <ul class="uzh-dropdown-menu">
+              {% for subitem in item.children %}
+              <li {% if subitem.current %}class="active"{% endif %}>
+                <a href="{{PREFIX_URL}}{{subitem.url}}">{{subitem.title}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% else %}
+          <li class="uzh-menu-item">
+            <a class="uzh-menu-link" href="{{PREFIX_URL}}{{item.url}}">{{item.title}}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <div class="uzh-dark-toggle">
+        {# language picker lives here #}
+        <div id="minimalistic_language_picker" style="margin-right:8px;">
+          <form id="change_language_form" method="post" action="{{PREFIX_URL}}/i18n/setlang/">
+            {% csrf_token %}
+            <input id="change_language_input_field" type="hidden" name="language"
+                   value="{{ user.user_profile_user.last_used_language }}">
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+</nav>
+
+{% elif header_config.theme == "aurora" %}
+{# ================================================================== #}
+{# AURORA — ANIMATED GRADIENT GLASSMORPHISM THEME                     #}
+{# ================================================================== #}
+
+<style>
+#affix-bar.affix { position:fixed; top:0; z-index:10!important; background:inherit; }
+</style>
+
+<nav id="signbank-bar" class="navbar-fixed-top theme-aurora" style="box-sizing:content-box; z-index:1030;">
+  <div class="aur-wrapper">
+
+    {# ── Main bar ── #}
+    <div class="aur-main-bar">
+      <div class="aur-main-inner">
+
+        {# Logo mark — uploaded logo or double-diamond prism fallback #}
+        <div class="aur-brand">
+          <a href="{{PREFIX_URL}}/">
+            <div class="aur-logo-mark">
+                <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
+                   alt="Signbank Logo" style="height:36px;width:auto;object-fit:contain;">
+            </div>
+            <div class="aur-title-wrap">
+              <span class="aur-title">{% if header_config.site_title %}{{ header_config.site_title }}{% else %}Signbank{% endif %}</span>
+              <span class="aur-subtitle">Sign Language Database</span>
+            </div>
+          </a>
+        </div>
+
+        {# Search #}
+        <div class="aur-search-wrap">
+          <form method="get" action="{{PREFIX_URL}}/signs/search/">
+            {% csrf_token %}
+            <div class="aur-search-pill">
+              <svg class="aur-search-icon" width="15" height="15" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+              </svg>
+              <input class="aur-search-input" type="text" name="search" id="menubar-search"
+                     placeholder="{% trans "Search signs…" %}" maxlength="60"
+                     onfocus="focusFunction()" onblur="blurFunction()" onclick="clickFunction()">
+            </div>
+          </form>
+        </div>
+
+        {# Right: datasets + divider + user + toggle #}
+        <div class="aur-right">
+          {% if SHOW_DATASET_INTERFACE_OPTIONS and viewable_datasets %}
+          <div class="aur-datasets">
+            {% for ds,selected in viewable_datasets %}
+            <a href="{{PREFIX_URL}}/datasets/switch/{{ds.acronym}}/"
+               class="aur-chip {% if selected %}aur-chip--active{% endif %}">
+              {{ds.generate_short_name|underscore_to_space}}
+            </a>
+            {% endfor %}
+          </div>
+          <div class="aur-vdivider"></div>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            <a class="aur-user-link" href="{% url 'registration:user_profile' %}">{% trans "Profile" %}</a>
+            <a class="aur-user-link" href="{% url 'logout' %}">{{ user.first_name }}</a>
+          {% else %}
+            <a class="aur-user-link" href="{{PREFIX_URL}}/accounts/login/">{% trans "Login" %}</a>
+          {% endif %}
+
+          <button class="aur-dark-btn" onclick="set_dark_mode()" title="Toggle dark mode">
+            <span class="glyphicon glyphicon-adjust" style="font-size:14px;"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# ── Frosted glass nav strip ── #}
+    <div class="aur-nav-strip">
+      <ul class="aur-nav-list">
+        {% for item in menu %}
+          {% if item.children %}
+          <li class="aur-nav-item aur-has-dropdown">
+            <a class="aur-nav-pill" href="{{PREFIX_URL}}{{item.url}}">
+              {{item.title}}<span class="aur-nav-caret">▾</span>
+            </a>
+            <ul class="aur-dropdown">
+              {% for subitem in item.children %}
+              <li {% if subitem.current %}class="active"{% endif %}>
+                <a href="{{PREFIX_URL}}{{subitem.url}}">{{subitem.title}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% else %}
+          <li class="aur-nav-item">
+            <a class="aur-nav-pill" href="{{PREFIX_URL}}{{item.url}}">{{item.title}}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+
+      <div class="aur-attribution">
+        <span class="aur-attr-diamond">◈</span>
+        <span class="aur-attr-text">
+          {{ header_config.institution_name|default:"Universität Zürich" }} &middot;
+          {{ header_config.department_name|default:"Institut für Computerlinguistik" }}
+        </span>
+      </div>
+
+      {# Language picker form (hidden, needed by JS) #}
+      <div id="minimalistic_language_picker" style="display:none;">
+        <form id="change_language_form" method="post" action="{{PREFIX_URL}}/i18n/setlang/">
+          {% csrf_token %}
+          <input id="change_language_input_field" type="hidden" name="language"
+                 value="{{ user.user_profile_user.last_used_language }}">
+        </form>
+      </div>
+    </div>
+
+    {# White shimmer accent line #}
+    <div class="aur-accent-line"></div>
+
+  </div>{# end .aur-wrapper #}
+</nav>
+
+{% elif header_config.theme == "modern" %}
+{# ================================================================== #}
+{# FROST — MODERN DARK THEME                                           #}
+{# ================================================================== #}
+
+<style>
+#affix-bar.affix { position:fixed; top:0; z-index:10!important; background:inherit; }
+</style>
+
+<nav id="signbank-bar" class="navbar-fixed-top theme-modern" style="box-sizing:content-box; z-index:1030;">
+
+  {# ── Main bar ── #}
+  <div class="mod-main-bar">
+    <div class="mod-main-inner">
+
+      {# Brand / logo #}
+      <div class="mod-brand">
+        <a href="{{PREFIX_URL}}/">
+          {# Uploaded logo or hand-wave SVG fallback #}
+          <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
+               alt="Signbank Logo" style="height:32px;width:auto;object-fit:contain;flex-shrink:0;">
+          <div class="mod-title-wrap">
+            <span class="mod-title">{% if header_config.site_title %}{{ header_config.site_title }}{% else %}Signbank{% endif %}</span>
+            <span class="mod-subtitle">Sign Language Database</span>
+          </div>
+        </a>
+      </div>
+
+      {# Search pill #}
+      <div class="mod-search-wrap">
+        <form method="get" action="{{PREFIX_URL}}/signs/search/">
+          {% csrf_token %}
+          <div class="mod-search-pill">
+            <svg class="mod-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+            </svg>
+            <input class="mod-search-input" type="text" name="search" id="menubar-search"
+                   placeholder="{% trans "Search signs…" %}" maxlength="60"
+                   onfocus="focusFunction()" onblur="blurFunction()" onclick="clickFunction()">
+          </div>
+        </form>
+      </div>
+
+      {# Right: datasets + divider + user + dark toggle #}
+      <div class="mod-right">
+        {% if SHOW_DATASET_INTERFACE_OPTIONS and viewable_datasets %}
+        <div class="mod-datasets">
+          {% for ds,selected in viewable_datasets %}
+          <a href="{{PREFIX_URL}}/datasets/switch/{{ds.acronym}}/"
+             class="mod-chip {% if selected %}mod-chip--active{% endif %}">
+            {{ds.generate_short_name|underscore_to_space}}
+          </a>
+          {% endfor %}
+        </div>
+        <div class="mod-vdivider"></div>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          <a class="mod-user-link" href="{% url 'registration:user_profile' %}">{% trans "Profile" %}</a>
+          <a class="mod-user-link" href="{% url 'logout' %}">{{ user.first_name }}</a>
+        {% else %}
+          <a class="mod-user-link" href="{{PREFIX_URL}}/accounts/login/">{% trans "Login" %}</a>
+        {% endif %}
+
+        <button class="mod-dark-btn" onclick="set_dark_mode()" title="Toggle dark mode">
+          <span class="glyphicon glyphicon-adjust" style="font-size:14px;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# ── Nav strip ── #}
+  <div class="mod-nav-strip">
+    <ul class="mod-nav-list">
+      {% for item in menu %}
+        {% if item.children %}
+        <li class="mod-nav-item mod-has-dropdown">
+          <a class="mod-nav-pill" href="{{PREFIX_URL}}{{item.url}}">
+            {{item.title}}<span class="mod-nav-caret">▾</span>
+          </a>
+          <ul class="mod-dropdown">
+            {% for subitem in item.children %}
+            <li {% if subitem.current %}class="active"{% endif %}>
+              <a href="{{PREFIX_URL}}{{subitem.url}}">{{subitem.title}}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% else %}
+        <li class="mod-nav-item">
+          <a class="mod-nav-pill" href="{{PREFIX_URL}}{{item.url}}">{{item.title}}</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    {# UZH attribution — right-aligned #}
+    <div class="mod-attribution">
+      <span class="mod-attr-dot"></span>
+      <span class="mod-attr-text">
+        {{ header_config.institution_name|default:"Universität Zürich" }} &middot;
+        {{ header_config.department_name|default:"Institut für Computerlinguistik" }}
+      </span>
+    </div>
+
+    {# Hidden language picker form (still needs to exist for JS) #}
+    <div id="minimalistic_language_picker" style="display:none;">
+      <form id="change_language_form" method="post" action="{{PREFIX_URL}}/i18n/setlang/">
+        {% csrf_token %}
+        <input id="change_language_input_field" type="hidden" name="language"
+               value="{{ user.user_profile_user.last_used_language }}">
+      </form>
+    </div>
+  </div>
+
+  {# Gradient accent line #}
+  <div class="mod-accent-line"></div>
+
+</nav>
+
+{% else %}
+{# ================================================================== #}
+{# DEFAULT GLOBAL SIGNBANK THEME                                       #}
+{# ================================================================== #}
+
+<style>
+#affix-bar.affix { position:fixed; top:0; z-index:10!important; background:inherit; }
 </style>
 
 <nav id="signbank-bar" class="navbar navbar-light navbar-fixed-top" style="box-sizing:content-box;;height:200px;">
@@ -21,9 +380,8 @@
     {% if SHOW_DATASET_INTERFACE_OPTIONS and viewable_datasets %}
         <div class='navbar-text' style="left-margin: 15px;width:auto">
             <div class='taglist ribbon_list'>
-                {% load underscore_to_space %}
                 {% for ds,selected in viewable_datasets %}
-                <a href="{{PREFIX_URL}}/datasets/{{ds.acronym}}">
+                <a href="{{PREFIX_URL}}/datasets/switch/{{ds.acronym}}/">
                     <div class="ribbon {% if selected %}selected{% endif %}">
                         {{ds.generate_short_name|underscore_to_space}}
                     </div>
@@ -42,7 +400,6 @@
 {% get_current_language as WEBSITE_LANGUAGE %}
 <nav id='navbar-menus' class="collapse navbar-collapse navbar-upper navbar-default" role="navigation" style="display:inline;box-sizing:content-box;padding:0;">
 
-  <!-- Collect the nav links, forms, and other content for toggling -->
   <nav class="nav navbar-upper" id="menu-pull-downs" style="display:inline;padding-left:0px;box-sizing:content-box;">
 
     <nav class="nav navbar-upper">
@@ -56,7 +413,6 @@
         </div>
     <div class="collapse navbar-collapse" id="signbank-menus">
     <ul class="nav navbar-left navbar-nav navbar-nav-light" style="margin-left:15px;box-sizing:content-box;">
-    {# add in the top level menu items from pages #}
     {% for item in menu %}
 
         {% if item.children %}
@@ -135,3 +491,5 @@
 
 </nav>
 </nav>
+
+{% endif %}

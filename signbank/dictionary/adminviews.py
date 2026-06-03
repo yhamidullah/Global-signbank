@@ -49,7 +49,7 @@ from signbank.settings.server_specific import (URL, PREFIX_URL, LANGUAGE_CODE, L
                                                SHOW_FIELD_CHOICE_COLORS, HANDSHAPE_RESULT_FIELDS,
                                                SHOW_DATASET_INTERFACE_OPTIONS, SHOW_QUERY_PARAMETERS_AS_BUTTON,
                                                SHOW_LETTER_NUMBER_PHONOLOGY, MINIMAL_PAIRS_CHOICE_FIELDS,
-                                               GLOSS_CHOICE_FIELDS, GLOSS_LIST_DISPLAY_FIELDS, GLOSSSENSE_CHOICE_FIELDS,
+                                               GLOSS_CHOICE_FIELDS, GLOSSSENSE_CHOICE_FIELDS,
                                                MORPHEME_CHOICE_FIELDS, MORPHEME_DISPLAY_FIELDS, SEARCH_BY,
                                                MINIMAL_PAIRS_SEARCH_FIELDS,
                                                PUBLIC_PHONOLOGY_FIELDS, PUBLIC_SEMANTICS_FIELDS, PUBLIC_MAIN_FIELDS,
@@ -68,7 +68,7 @@ from signbank.dictionary.models import (Dataset, UserProfile, AffiliatedUser, Af
                                         SenseTranslation, SearchHistory, SemanticField,
                                         DerivationHistory, BlendMorphology, MorphologyDefinition, SimultaneousMorphologyDefinition,
                                         FieldChoice, FieldChoiceForeignKey, get_default_language_id, fieldname_to_kind,
-                                        CATEGORY_MODELS_MAPPING, ExampleSentence)
+                                        CATEGORY_MODELS_MAPPING, ExampleSentence, GlossListConfig)
 from signbank.dictionary.translate_choice_list import (machine_value_to_translated_human_value,
                                                        choicelist_queryset_to_translated_dict,
                                                        choicelist_queryset_to_machine_value_dict,
@@ -333,10 +333,13 @@ def order_queryset_by_sort_order(get, qs, queryset_language_codes):
         ordered = order_queryset_by_tuple_list(qs, sOrder, "Location", bReversed)
     elif sOrder.startswith("annotationidglosstranslation_order_") or sOrder.startswith("-annotationidglosstranslation_order_"):
         ordered = order_queryset_by_annotationidglosstranslation(qs, sOrder)
+        bText = False  # direction already encoded in order_by(); prevent double-reverse below
     elif sOrder.startswith("lemmaidglosstranslation_order_") or sOrder.startswith("-lemmaidglosstranslation_order_"):
         ordered = order_queryset_by_lemmaidglosstranslation(qs, sOrder)
+        bText = False
     elif sOrder.startswith("translation_") or sOrder.startswith("-translation_"):
         ordered = order_queryset_by_translation(qs, sOrder)
+        bText = False
     else:
         # Use straightforward ordering on field [sOrder]
         if default_sort_order:
@@ -358,7 +361,12 @@ def order_queryset_by_sort_order(get, qs, queryset_language_codes):
                 ordered += list(qs_special) #.order_by(sort_key))
                 ordered += list(qs_empty)
         else:
-            ordered = qs
+            # Simple text field on Gloss model — order directly
+            try:
+                ordered = qs.order_by(sOrder)
+                bText = False  # direction encoded in sOrder prefix; prevent double-reverse
+            except Exception:
+                ordered = qs
     if bReversed and bText:
         ordered.reverse()
 
@@ -671,7 +679,7 @@ class GlossListView(ListView):
                 context['paginate_by'] = self.paginate_by
 
         column_headers = []
-        for fieldname in GLOSS_LIST_DISPLAY_FIELDS:
+        for fieldname in GlossListConfig.get_display_fields():
             if fieldname not in Gloss.get_field_names():
                 continue
             field_label = Gloss.get_field(fieldname).verbose_name
@@ -2945,7 +2953,7 @@ class QueryListView(ListView):
 
         context['SHOW_DATASET_INTERFACE_OPTIONS'] = SHOW_DATASET_INTERFACE_OPTIONS
         context['USE_REGULAR_EXPRESSIONS'] = USE_REGULAR_EXPRESSIONS
-        context['GLOSS_LIST_DISPLAY_FIELDS'] = GLOSS_LIST_DISPLAY_FIELDS
+        context['GLOSS_LIST_DISPLAY_FIELDS'] = GlossListConfig.get_display_fields()
 
         if 'search_results' in self.request.session.keys():
             search_results = self.request.session['search_results']
@@ -2983,7 +2991,7 @@ class QueryListView(ListView):
             toggle_gloss_list_display_fields, toggle_query_parameter_fields, toggle_publication_fields = \
             query_parameters_toggle_fields(self.query_parameters)
 
-        display_fields = GLOSS_LIST_DISPLAY_FIELDS
+        display_fields = GlossListConfig.get_display_fields()
         for qpf in query_fields_focus:
             if qpf not in display_fields:
                 display_fields += [qpf]
@@ -3875,6 +3883,12 @@ class DatasetListView(ListView):
     model = Dataset
     # set the default dataset, this should not be empty
     dataset_acronym = DEFAULT_DATASET_ACRONYM
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_authenticated:
+            qs = qs.filter(is_public=True)
+        return qs
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -5986,7 +6000,7 @@ def minimalpairs_ajax_complete(request, gloss_id, gloss_detail=False):
 
 def glosslist_ajax_complete(request, gloss_id):
 
-    display_fields = GLOSS_LIST_DISPLAY_FIELDS
+    display_fields = GlossListConfig.get_display_fields()
     query_fields_parameters = []
 
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' and request.method == 'GET':
@@ -6060,7 +6074,7 @@ def glosslist_ajax_complete(request, gloss_id):
 
 def glosslistheader_ajax(request):
 
-    display_fields = GLOSS_LIST_DISPLAY_FIELDS
+    display_fields = GlossListConfig.get_display_fields()
     query_fields_parameters = []
 
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' and request.method == 'GET':
@@ -6150,7 +6164,7 @@ def senselist_ajax_complete(request, sense_id):
 
 def senselistheader_ajax(request):
 
-    display_fields = GLOSS_LIST_DISPLAY_FIELDS
+    display_fields = GlossListConfig.get_display_fields()
     query_fields_parameters = []
 
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' and request.method == 'GET':
@@ -6221,7 +6235,7 @@ def lemmaglosslist_ajax_complete(request, gloss_id):
     sensetranslations_per_language = senses_per_language_list(this_gloss)
 
     column_values = []
-    gloss_list_display_fields = GLOSS_LIST_DISPLAY_FIELDS
+    gloss_list_display_fields = GlossListConfig.get_display_fields()
     for fieldname in gloss_list_display_fields:
 
         machine_value = getattr(this_gloss, fieldname)

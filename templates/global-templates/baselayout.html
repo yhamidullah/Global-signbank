@@ -13,11 +13,30 @@
 
     <link rel="stylesheet" href="{{STATIC_URL}}css/minimalistic_language_picker.css">
 
+    {% if header_config.favicon %}
+    <link rel="icon" href="{{ header_config.favicon.url }}">
+    {% else %}
     <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png">
+    {% endif %}
+    <link rel="preload" href="{{ STATIC_URL }}fonts/HamNoSysUnicode.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/hamnosys.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/header-theme-uzh.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/header-theme-modern.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/header-theme-aurora.css">
+    {% with header_config.get_resolved_colors as c %}{% if c %}
+    <style>
+      :root {
+        {% if c.color_primary %}--sb-primary: {{ c.color_primary }};{% endif %}
+        {% if c.color_primary_text %}--sb-primary-text: {{ c.color_primary_text }};{% endif %}
+        {% if c.color_accent %}--sb-accent: {{ c.color_accent }};{% endif %}
+        {% if c.color_inst_bar_bg %}--sb-inst-bar-bg: {{ c.color_inst_bar_bg }};{% endif %}
+      }
+    </style>
+    {% endif %}{% endwith %}
 
     {% block extrahead %}{% endblock %}
   </head>
-  <body class='body body-light'>
+  <body class='body body-light{% if header_config.theme == "uzh" %} theme-uzh{% elif header_config.theme == "modern" %} theme-modern{% elif header_config.theme == "aurora" %} theme-aurora{% endif %}'>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

@@ -18,11 +18,16 @@
       <div class="thumbnail_container">
       <a href="{{PREFIX_URL}}/dictionary/gloss/{{focus_gloss.pk}}{% if user.is_anonymous %}.html{% else %}/{% endif %}">
 
-        <div id='glossvideo_{{focus_gloss.id}}'>
+        <div id='glossvideo_{{focus_gloss.id}}'{% if not focus_gloss.get_image_url %} data-no-image="true"{% endif %}>
+            {% if focus_gloss.get_image_url %}
             <img class="thumbnail" src="{{protected_media_url}}{{focus_gloss.get_image_url}}">
+            {% endif %}
 
             {% if focus_gloss.has_video %}
-            <video id="videoplayer" class="thumbnail-video" src="{{protected_media_url}}{{focus_gloss.get_video_url}}"  type="video/mp4" muted="muted"></video>
+            <video id="videoplayer" class="thumbnail-video"
+                   src="{{protected_media_url}}{{focus_gloss.get_video_url}}{% if not focus_gloss.get_image_url %}#t=0.001{% endif %}"
+                   type="video/mp4" muted="muted" preload="metadata"
+                   {% if not focus_gloss.get_image_url %}data-no-image="true"{% endif %}></video>
             {% endif %}
         </div>
 
@@ -73,7 +78,7 @@
 
 
     {% for field,value in column_values %}
-    <td class="field_{{field}}">
+    <td class="field_{{field}}"{% if field == 'hamnosys' %} style="font-family:'HamNoSys','HamNoSysUnicode','Hamnosysunicode',monospace;font-size:1.4em;"{% endif %}>
         <div>{{value}}</div>
     </td>
 

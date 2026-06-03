@@ -93,6 +93,16 @@ class FieldChoice(models.Model):
     WORDCLASS = 'WordClass'
     SENTENCETYPE = 'SentenceType'
     PROVENANCE = 'Provenance'
+    # Non-manual annotation (ECV) categories
+    NMAEYEBROWS = 'NmaEyebrows'
+    NMAEYELIDS = 'NmaEyelids'
+    NMAGAZE = 'NmaGaze'
+    NMAHEAD = 'NmaHead'
+    NMAMOUTHGESTURE = 'NmaMouthGesture'
+    NMANK = 'NmaNmk'
+    NMANOSE = 'NmaNose'
+    NMATORSO = 'NmaTorso'
+    NMASHOULDERS = 'NmaShoulders'
 
     FIELDCHOICE_FIELDS = [
         (ABSORIFING, 'AbsOriFing'),
@@ -127,7 +137,16 @@ class FieldChoice(models.Model):
         (VALENCE, 'Valence'),
         (WORDCLASS, 'WordClass'),
         (SENTENCETYPE, 'SentenceType'),
-        (PROVENANCE, 'Provenance')
+        (PROVENANCE, 'Provenance'),
+        (NMAEYEBROWS, 'NmaEyebrows'),
+        (NMAEYELIDS, 'NmaEyelids'),
+        (NMAGAZE, 'NmaGaze'),
+        (NMAHEAD, 'NmaHead'),
+        (NMAMOUTHGESTURE, 'NmaMouthGesture'),
+        (NMANK, 'NmaNmk'),
+        (NMANOSE, 'NmaNose'),
+        (NMATORSO, 'NmaTorso'),
+        (NMASHOULDERS, 'NmaShoulders'),
     ]
 
     field = models.CharField(max_length=50, choices=FIELDCHOICE_FIELDS)
@@ -1166,6 +1185,61 @@ class Gloss(MetaModelMixin, models.Model):
     mouthG = models.CharField(_("Mouth Gesture"), max_length=50, blank=True)
     mouthing = models.CharField(_("Mouthing"), max_length=50, blank=True)
     phonetVar = models.CharField(_("Phonetic Variation"), max_length=50, blank=True)
+
+    # Non-manual annotation fields (ECV-sourced controlled vocabularies)
+    nmaEyebrows = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                        limit_choices_to={'field': FieldChoice.NMAEYEBROWS},
+                                        field_choice_category=FieldChoice.NMAEYEBROWS,
+                                        verbose_name=_("NMA Eyebrows"),
+                                        related_name="nma_eyebrows")
+
+    nmaEyelids = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                       limit_choices_to={'field': FieldChoice.NMAEYELIDS},
+                                       field_choice_category=FieldChoice.NMAEYELIDS,
+                                       verbose_name=_("NMA Eyelids"),
+                                       related_name="nma_eyelids")
+
+    nmaGaze = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                    limit_choices_to={'field': FieldChoice.NMAGAZE},
+                                    field_choice_category=FieldChoice.NMAGAZE,
+                                    verbose_name=_("NMA Gaze"),
+                                    related_name="nma_gaze")
+
+    nmaHead = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                    limit_choices_to={'field': FieldChoice.NMAHEAD},
+                                    field_choice_category=FieldChoice.NMAHEAD,
+                                    verbose_name=_("NMA Head"),
+                                    related_name="nma_head")
+
+    nmaMouthGesture = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                            limit_choices_to={'field': FieldChoice.NMAMOUTHGESTURE},
+                                            field_choice_category=FieldChoice.NMAMOUTHGESTURE,
+                                            verbose_name=_("NMA Mouth Gesture"),
+                                            related_name="nma_mouth_gesture")
+
+    nmaNmk = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                   limit_choices_to={'field': FieldChoice.NMANK},
+                                   field_choice_category=FieldChoice.NMANK,
+                                   verbose_name=_("NMA Non-Manual Component"),
+                                   related_name="nma_nmk")
+
+    nmaNose = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                    limit_choices_to={'field': FieldChoice.NMANOSE},
+                                    field_choice_category=FieldChoice.NMANOSE,
+                                    verbose_name=_("NMA Nose"),
+                                    related_name="nma_nose")
+
+    nmaTorso = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                     limit_choices_to={'field': FieldChoice.NMATORSO},
+                                     field_choice_category=FieldChoice.NMATORSO,
+                                     verbose_name=_("NMA Torso"),
+                                     related_name="nma_torso")
+
+    nmaShoulders = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True, blank=True,
+                                         limit_choices_to={'field': FieldChoice.NMASHOULDERS},
+                                         field_choice_category=FieldChoice.NMASHOULDERS,
+                                         verbose_name=_("NMA Shoulders"),
+                                         related_name="nma_shoulders")
 
     locPrimLH = FieldChoiceForeignKey(FieldChoice, on_delete=models.SET_NULL, null=True,
                                           limit_choices_to={'field': FieldChoice.LOCATION},
@@ -4453,3 +4527,125 @@ class GlossProvenance(models.Model):
 
     def provenance_tuple(self):
         return self.get_method_display(), self.provenance_text()
+
+
+class GlossListConfig(models.Model):
+    """Singleton model — edit the one row to control which columns appear in the gloss search results list."""
+
+    display_fields = models.JSONField(
+        default=list,
+        help_text="Ordered list of Gloss field names shown as extra columns in the search results."
+    )
+
+    class Meta:
+        verbose_name = "Gloss List Column Configuration"
+        verbose_name_plural = "Gloss List Column Configuration"
+
+    def __str__(self):
+        return "Gloss List Column Configuration"
+
+    @classmethod
+    def get_display_fields(cls):
+        config = cls.objects.first()
+        if config and config.display_fields:
+            return list(config.display_fields)
+        from signbank.settings.server_specific import GLOSS_LIST_DISPLAY_FIELDS
+        return GLOSS_LIST_DISPLAY_FIELDS
+
+
+class HeaderConfig(models.Model):
+    """Singleton model — controls the visual theme and branding of the site header."""
+
+    THEME_GLOBAL = 'global'
+    THEME_UZH = 'uzh'
+    THEME_MODERN = 'modern'
+    THEME_AURORA = 'aurora'
+    THEME_CHOICES = [
+        (THEME_GLOBAL, 'Global Signbank (default)'),
+        (THEME_UZH, 'UZH Computational Linguistics'),
+        (THEME_MODERN, 'Frost — Modern Dark (UZH)'),
+        (THEME_AURORA, 'Aurora — Animated Gradient Glassmorphism'),
+    ]
+
+    # Best-looking default colours per theme; used when fields are left blank
+    THEME_DEFAULT_COLORS = {
+        THEME_GLOBAL: {},
+        THEME_UZH: {
+            'color_primary':      '#0028a5',
+            'color_primary_text': '#ffffff',
+            'color_accent':       '#0028a5',
+            'color_inst_bar_bg':  '#f0f2f7',
+        },
+        THEME_MODERN: {
+            'color_primary':      '#0f172a',
+            'color_primary_text': '#f1f5f9',
+            'color_accent':       '#3b82f6',
+            'color_inst_bar_bg':  '#0d1117',
+        },
+        THEME_AURORA: {
+            'color_primary':      '#4f46e5',
+            'color_primary_text': '#ffffff',
+            'color_accent':       '#06b6d4',
+            'color_inst_bar_bg':  '#3730a3',
+        },
+    }
+
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default=THEME_GLOBAL)
+    site_title = models.CharField(
+        max_length=100, blank=True,
+        help_text="Override the main title shown in the header (leave blank for default)."
+    )
+    institution_name = models.CharField(
+        max_length=200, blank=True, default='Universität Zürich',
+        help_text="Shown in the UZH theme institutional bar."
+    )
+    department_name = models.CharField(
+        max_length=200, blank=True, default='Institut für Computerlinguistik',
+        help_text="Shown in the UZH theme institutional bar."
+    )
+    logo = models.FileField(
+        upload_to='branding/', blank=True, null=True,
+        help_text="Upload a logo image (SVG, PNG, etc.) shown in the header. Replaces the built-in theme icon."
+    )
+    favicon = models.FileField(
+        upload_to='branding/', blank=True, null=True,
+        help_text="Upload a .png or .ico file to replace the default browser tab icon."
+    )
+    color_primary = models.CharField(
+        max_length=20, blank=True, default='',
+        help_text="Main brand color (hex, e.g. #0028a5). Used for nav bar background, links, active states."
+    )
+    color_primary_text = models.CharField(
+        max_length=20, blank=True, default='',
+        help_text="Text/icon color on the primary-colored background (default: #ffffff)."
+    )
+    color_accent = models.CharField(
+        max_length=20, blank=True, default='',
+        help_text="Accent color for hover states, borders, and dropdown tops (defaults to primary)."
+    )
+    color_inst_bar_bg = models.CharField(
+        max_length=20, blank=True, default='',
+        help_text="Institutional strip background color (UZH theme, default: #f0f2f7)."
+    )
+
+    class Meta:
+        verbose_name = 'Header Theme Configuration'
+        verbose_name_plural = 'Header Theme Configuration'
+
+    def __str__(self):
+        return f'Header Theme Configuration ({self.get_theme_display()})'
+
+    @classmethod
+    def get_config(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def get_resolved_colors(self):
+        """Return colour values, falling back to per-theme best defaults."""
+        defaults = self.THEME_DEFAULT_COLORS.get(self.theme, {})
+        return {
+            'color_primary':      self.color_primary      or defaults.get('color_primary', ''),
+            'color_primary_text': self.color_primary_text or defaults.get('color_primary_text', ''),
+            'color_accent':       self.color_accent        or defaults.get('color_accent', ''),
+            'color_inst_bar_bg':  self.color_inst_bar_bg  or defaults.get('color_inst_bar_bg', ''),
+        }

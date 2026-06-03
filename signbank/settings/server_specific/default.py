@@ -139,7 +139,8 @@ PUBLIC_PHONOLOGY_FIELDS = ['handedness', 'domhndsh', 'subhndsh', 'handCh', 'rela
                            'repeat', 'altern',
                            'relOriMov', 'relOriLoc', 'oriCh',
                            'domhndsh_letter', 'domhndsh_number', 'subhndsh_letter', 'subhndsh_number',
-                           'weakdrop', 'weakprop']
+                           'weakdrop', 'weakprop',
+                           'hamnosys', 'mouthing', 'mouthG', 'phonOth', 'locVirtObj', 'phonetVar']
 
 FIELDS['semantics'] = ['semField', 'derivHist', 'namEnt','valence','iconImg','concConcSet']
 
@@ -201,7 +202,7 @@ MINIMAL_PAIRS_CHOICE_FIELDS = ['handedness', 'domhndsh', 'subhndsh', 'handCh', '
                                'relOriLoc', 'oriCh', 'contType', 'movSh', 'movDir', 'namEnt', 'semField', 'valence']
 
 # Display these fields as columns in the list view
-GLOSS_LIST_DISPLAY_FIELDS = ['handedness', 'domhndsh', 'subhndsh', 'locprim']
+GLOSS_LIST_DISPLAY_FIELDS = ['hamnosys', 'mouthing', 'handedness', 'domhndsh', 'subhndsh', 'locprim']
 
 # These are fields in the Search forms by panel
 SEARCH_BY = {}
