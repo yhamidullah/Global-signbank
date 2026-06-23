@@ -52,10 +52,16 @@ class Command(BaseCommand):
                             help='Print what would be imported without writing')
         parser.add_argument('--limit', type=int, default=0,
                             help='Stop after N rows (0 = all, useful for testing)')
+        parser.add_argument('--keep-apostrophes', action='store_true',
+                            help='Keep glosses whose name contains an apostrophe '
+                                 "(iLex phonetic variants like NAME_1A'bew). By "
+                                 'default these rows are skipped, since they usually '
+                                 'have no video and carry hard parsing rules.')
 
     def handle(self, *args, **options):
         dry_run = options['dry_run']
         limit = options['limit']
+        keep_apostrophes = options['keep_apostrophes']
         acronym = options['dataset_acronym']
         ds_name = options['dataset_name']
         lang_code = options['language_code']
@@ -100,7 +106,7 @@ class Command(BaseCommand):
         ws = wb.active
         self.stdout.write(f'Sheet: {ws.title}  rows≈{ws.max_row}')
 
-        created_count = skipped = errors = 0
+        created_count = skipped = errors = skipped_apostrophe = 0
 
         for row in ws.iter_rows(min_row=2, values_only=True):
             raw_name = row[0]
@@ -109,6 +115,13 @@ class Command(BaseCommand):
             hamnosys = str(row[3]).strip() if row[3] else ''
 
             if not raw_name or not raw_id:
+                continue
+
+            # By default skip iLex phonetic-variant names (those containing an
+            # apostrophe, straight ' or curly ’). They usually have no video and
+            # hard parsing rules. Use --keep-apostrophes to import them anyway.
+            if not keep_apostrophes and ("'" in str(raw_name) or "’" in str(raw_name)):
+                skipped_apostrophe += 1
                 continue
 
             try:
@@ -180,5 +193,6 @@ class Command(BaseCommand):
         action = 'Would create' if dry_run else 'Created'
         self.stdout.write(
             f'\nDone — {action}: {created_count} | '
-            f'skipped (exists): {skipped} | errors: {errors}'
+            f'skipped (exists): {skipped} | '
+            f'skipped (apostrophe): {skipped_apostrophe} | errors: {errors}'
         )

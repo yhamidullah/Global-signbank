@@ -464,7 +464,6 @@ function clearForm() {
  * @returns {void}
  */
 function do_sort_column(field_name, action, frmName) {
-  // Combine @field_name and @action into [sOrder]
   var sOrder = field_name;
   if (action == 'desc') {
     sOrder = '-' + sOrder;
@@ -472,16 +471,15 @@ function do_sort_column(field_name, action, frmName) {
     sOrder = '';
   }
 
-  // Build a new URL from the current location, replacing/adding sortOrder
-  // This keeps the user on the same page (search or show_all) and preserves
-  // all existing query parameters instead of re-submitting the form.
+  // Navigate to the same page with sortOrder added/updated in the URL.
+  // This preserves all existing query parameters and stays on the current
+  // page (show_all or search) instead of always submitting to /signs/search/.
   var params = new URLSearchParams(window.location.search);
   if (sOrder) {
     params.set('sortOrder', sOrder);
   } else {
     params.delete('sortOrder');
   }
-  // Reset to page 1 when sorting changes
   params.delete('page');
   window.location.href = window.location.pathname + '?' + params.toString();
 }

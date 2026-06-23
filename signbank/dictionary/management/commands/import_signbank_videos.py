@@ -35,6 +35,10 @@ class Command(BaseCommand):
                             help='Show matches without copying files or writing DB records')
         parser.add_argument('--limit', type=int, default=0,
                             help='Stop after N files (0 = no limit)')
+        parser.add_argument('--prune-no-video', action='store_true',
+                            help='After importing, delete any gloss in this dataset '
+                                 'that still has no video. Keeps the dataset to only '
+                                 'glosses that have a video.')
 
     def handle(self, *args, **options):
         dry_run = options['dry_run']
@@ -125,3 +129,20 @@ class Command(BaseCommand):
             f'\nDone — {action}: {copied}  |  skipped (no gloss match): {skipped_no_gloss}'
             f'  |  skipped (already exists): {skipped_exists}  |  errors: {errors}'
         )
+
+        # ── Optional: prune glosses that ended up without any video ──────────
+        if options['prune_no_video']:
+            gids_with_video = set(
+                GlossVideo.objects.filter(gloss__lemma__dataset=dataset)
+                .values_list('gloss_id', flat=True)
+            )
+            no_video_qs = (
+                Gloss.objects.filter(lemma__dataset=dataset)
+                .exclude(id__in=gids_with_video)
+            )
+            n_no_video = no_video_qs.count()
+            if dry_run:
+                self.stdout.write(f'[dry-run] Would prune {n_no_video} glosses with no video.')
+            else:
+                no_video_qs.delete()
+                self.stdout.write(f'Pruned {n_no_video} glosses with no video.')

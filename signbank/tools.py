@@ -1982,11 +1982,25 @@ def write_ecv_file_for_dataset(dataset_name):
         return ''
 
     sOrder = 'annotationidglosstranslation__text'
-    if dataset_id.default_language:
-        lang_attr_name = dataset_id.default_language.language_code_2char
-    else:
-        lang_attr_name = DEFAULT_KEYWORDS_LANGUAGE['language_code_2char']
     sort_language = 'annotationidglosstranslation__language__language_code_2char'
+
+    # Choose a sort/filter language that actually has annotations in this dataset.
+    # The configured default_language may have no annotations (e.g. a dataset
+    # annotated only in German while default_language is English). Using such a
+    # language here filters out every gloss and produces an empty lexicon, so we
+    # fall back to the first candidate language that has annotations.
+    candidate_languages = []
+    if dataset_id.default_language:
+        candidate_languages.append(dataset_id.default_language.language_code_2char)
+    candidate_languages += [lang.language_code_2char for lang in dataset_id.translation_languages.all()]
+    candidate_languages.append(DEFAULT_KEYWORDS_LANGUAGE['language_code_2char'])
+
+    lang_attr_name = candidate_languages[0]
+    for code in candidate_languages:
+        if query_dataset.filter(**{sort_language: code}).exists():
+            lang_attr_name = code
+            break
+
     qs_empty = query_dataset.filter(**{sOrder + '__isnull': True})
     qs_letters = query_dataset.filter(**{sOrder + '__regex': r'^[a-zA-Z]', sort_language: lang_attr_name})
     qs_special = query_dataset.filter(**{sOrder + '__regex': r'^[^a-zA-Z]', sort_language: lang_attr_name})
@@ -1994,6 +2008,13 @@ def write_ecv_file_for_dataset(dataset_name):
     ordered = list(qs_letters.order_by(sOrder))
     ordered += list(qs_special.order_by(sOrder))
     ordered += list(qs_empty)
+
+    # Safety net: include any glosses not captured above (e.g. glosses whose only
+    # annotation is in a language other than the chosen sort language), so the
+    # lexicon never silently drops entries.
+    if len(ordered) < query_dataset.count():
+        captured_ids = {gloss.id for gloss in ordered}
+        ordered += list(query_dataset.exclude(id__in=captured_ids))
 
     nma_categories = [
         {
@@ -2058,7 +2079,7 @@ def write_ecv_file_for_dataset(dataset_name):
         'glosses': ordered,
         'dataset': dataset_id,
         'languages': dataset_id.translation_languages.all(),
-        'resource_url': URL + PREFIX_URL + '/dictionary/gloss/',
+        'resource_url': URL.rstrip('/') + PREFIX_URL + '/dictionary/gloss/',
         'nma_categories': nma_categories,
     }
     ecv_template = get_template('dictionary/ecv.xml')

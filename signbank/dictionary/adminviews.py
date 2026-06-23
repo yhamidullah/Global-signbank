@@ -333,7 +333,7 @@ def order_queryset_by_sort_order(get, qs, queryset_language_codes):
         ordered = order_queryset_by_tuple_list(qs, sOrder, "Location", bReversed)
     elif sOrder.startswith("annotationidglosstranslation_order_") or sOrder.startswith("-annotationidglosstranslation_order_"):
         ordered = order_queryset_by_annotationidglosstranslation(qs, sOrder)
-        bText = False  # direction already encoded in order_by(); prevent double-reverse below
+        bText = False  # direction encoded in order_by(); prevent double-reverse
     elif sOrder.startswith("lemmaidglosstranslation_order_") or sOrder.startswith("-lemmaidglosstranslation_order_"):
         ordered = order_queryset_by_lemmaidglosstranslation(qs, sOrder)
         bText = False
@@ -355,16 +355,14 @@ def order_queryset_by_sort_order(get, qs, queryset_language_codes):
                 qs_letters = qs.filter(**{sOrder+'__regex': r'^[a-zA-Z]', sort_language: lang_attr_name})
                 qs_special = qs.filter(**{sOrder+'__regex': r'^[^a-zA-Z]', sort_language: lang_attr_name})
 
-                # sort_key = sOrder
-                # # Using the order_by here results in duplicating the objects!
-                ordered = list(qs_letters) #.order_by(sort_key))
-                ordered += list(qs_special) #.order_by(sort_key))
+                ordered = list(qs_letters)
+                ordered += list(qs_special)
                 ordered += list(qs_empty)
         else:
-            # Simple text field on Gloss model — order directly
+            # Simple field on Gloss — order directly; direction encoded in sOrder prefix
             try:
                 ordered = qs.order_by(sOrder)
-                bText = False  # direction encoded in sOrder prefix; prevent double-reverse
+                bText = False
             except Exception:
                 ordered = qs
     if bReversed and bText:
@@ -2097,7 +2095,10 @@ class GlossRelationsDetailView(DetailView):
             simultaneous_morphology.append((sim_morph, morpheme_display))
         context['simultaneous_morphology'] = simultaneous_morphology
 
-        gloss_default_annotationidglosstranslation = gl.annotationidglosstranslation_set.get(language=default_language).text
+        try:
+            gloss_default_annotationidglosstranslation = gl.annotationidglosstranslation_set.get(language=default_language).text
+        except ObjectDoesNotExist:
+            gloss_default_annotationidglosstranslation = str(gl.id)
         # Put annotation_idgloss per language in the context
         context['annotation_idgloss'] = {}
         for language in gl.dataset.translation_languages.all():

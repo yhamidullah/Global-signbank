@@ -3404,9 +3404,25 @@ class Dataset(MetaModelMixin, models.Model):
 
         dataset_filename = self.acronym.lower().replace(" ", "_") + ".ecv"
         ecv_file_path = os.path.join(WRITABLE_FOLDER, ECV_FOLDER, dataset_filename)
-        ecv_relative_path = os.path.join(ECV_FOLDER, dataset_filename)
+        # protected_media resolves paths relative to WRITABLE_FOLDER, so always
+        # return a WRITABLE_FOLDER-relative path. ECV_FOLDER may be configured as
+        # an absolute path (as in the Docker deployment), in which case a naive
+        # join would yield an absolute path the download view cannot resolve.
+        ecv_relative_path = os.path.relpath(ecv_file_path, WRITABLE_FOLDER)
         if check_existence and os.path.exists(ecv_file_path):
             return ecv_relative_path
+
+        return ''
+
+    def get_ecv_timestamp(self):
+        """Modification time (epoch int) of the ECV file, used as a cache-buster
+        on the download link so the browser always fetches the latest version.
+        Returns '' when no ECV file exists."""
+
+        dataset_filename = self.acronym.lower().replace(" ", "_") + ".ecv"
+        ecv_file_path = os.path.join(WRITABLE_FOLDER, ECV_FOLDER, dataset_filename)
+        if os.path.exists(ecv_file_path):
+            return int(os.path.getmtime(ecv_file_path))
 
         return ''
 

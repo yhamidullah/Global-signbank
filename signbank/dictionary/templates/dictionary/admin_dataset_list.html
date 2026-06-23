@@ -120,8 +120,8 @@
                 <div id='dataset_ecv'>
                     {% if dataset.get_ecv_path %}
                     {% url 'dictionary:protected_media' '' as protected_media_url %}
-                        <a download="{{dataset.acronym}}.csv" href="{{protected_media_url}}{{dataset.get_ecv_path}}"
-                                    style="font-style: bold;">{{dataset.acronym}}.csv</a>
+                        <a download="{{dataset.acronym}}.ecv" href="{{protected_media_url}}{{dataset.get_ecv_path}}?v={{dataset.get_ecv_timestamp}}"
+                                    style="font-style: bold;">{{dataset.acronym}}.ecv</a>
                     {% else %}
                     <p>{% trans "No ECV file found." %}</p>
                     {% endif %}

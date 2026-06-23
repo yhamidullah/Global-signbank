@@ -14,15 +14,13 @@
 
 <nav id="signbank-bar" class="navbar-fixed-top" style="box-sizing:content-box; z-index:1030;">
 
-  {# ── Institutional top stripe ── #}
+  {# ── Institutional top stripe (logo only) ── #}
   <div class="uzh-institutional-bar">
     <div class="uzh-wordmark">
-      <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
-           alt="Signbank Logo" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;">
-      <div class="uzh-institution-text">
-        <span class="uzh-university">{{ header_config.institution_name|default:"Universität Zürich" }}</span>
-        <span class="uzh-department">{{ header_config.department_name|default:"Institut für Computerlinguistik" }}</span>
-      </div>
+      <a href="{{PREFIX_URL}}/">
+        <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
+             alt="Signbank Logo" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;">
+      </a>
     </div>
   </div>
 
@@ -305,6 +303,28 @@
           <a class="mod-user-link" href="{{PREFIX_URL}}/accounts/login/">{% trans "Login" %}</a>
         {% endif %}
 
+        {# Interface-language picker: plain no-JS POST forms, one per language (click submits to set_language) #}
+        {% get_current_language as CURLANG %}
+        {% get_available_languages as AVAIL_LANGS %}
+        <div class="mod-lang-picker">
+          {% for code, name in AVAIL_LANGS %}
+          <form method="post" action="{{PREFIX_URL}}/i18n/setlang/" style="display:inline;margin:0;padding:0;">
+            {% csrf_token %}
+            <input type="hidden" name="language" value="{{ code }}">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="mod-lang{% if code == CURLANG %} mod-lang--active{% endif %}"
+                    title="{{ name }}">{{ code|upper }}</button>
+          </form>
+          {% endfor %}
+        </div>
+        <style>
+          .mod-lang-picker{display:inline-flex;align-items:center;gap:8px;margin:0 8px;}
+          .mod-lang-picker .mod-lang{background:none;border:0;padding:0;color:rgba(255,255,255,.65);
+            font-weight:600;font-size:13px;cursor:pointer;line-height:1;font-family:inherit;}
+          .mod-lang-picker .mod-lang:hover{color:#fff;}
+          .mod-lang-picker .mod-lang--active{color:#fff;border-bottom:2px solid currentColor;padding-bottom:1px;}
+        </style>
+
         <button class="mod-dark-btn" onclick="set_dark_mode()" title="Toggle dark mode">
           <span class="glyphicon glyphicon-adjust" style="font-size:14px;"></span>
         </button>
@@ -346,14 +366,7 @@
       </span>
     </div>
 
-    {# Hidden language picker form (still needs to exist for JS) #}
-    <div id="minimalistic_language_picker" style="display:none;">
-      <form id="change_language_form" method="post" action="{{PREFIX_URL}}/i18n/setlang/">
-        {% csrf_token %}
-        <input id="change_language_input_field" type="hidden" name="language"
-               value="{{ user.user_profile_user.last_used_language }}">
-      </form>
-    </div>
+    {# Language picker moved to the top bar (mod-right) so it is visible. #}
   </div>
 
   {# Gradient accent line #}
@@ -392,9 +405,10 @@
      {% endif %}
     </div>
     <div class="nav navbar-right">
-    <a href="http://www.ru.nl/sign-lang" id='logoholder'
+    <a href="{{PREFIX_URL}}/" id='logoholder'
        class='visible-lg visible-md visible-sm'>
-        <img src="{{STATIC_URL}}/images/global/ru-logo.png"></a>
+        <img src="{% if header_config.logo %}{{ header_config.logo.url }}{% else %}{{ STATIC_URL }}images/global/GlobalSigbank_logo_white.svg{% endif %}"
+             alt="UZH Logo"></a>
     </div>
 </nav>
 {% get_current_language as WEBSITE_LANGUAGE %}

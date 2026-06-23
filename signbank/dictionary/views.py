@@ -1699,9 +1699,14 @@ def import_csv_lemmas(request):
 
 def switch_to_language(request,language):
 
-    user_profile = request.user.user_profile_user
-    user_profile.last_used_language = language
-    user_profile.save()
+    # Guard against anonymous users and users without a profile (was a 500).
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.user_profile_user
+            user_profile.last_used_language = language
+            user_profile.save()
+        except Exception:
+            pass
 
     return HttpResponse('OK')
 

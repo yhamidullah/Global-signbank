@@ -68,18 +68,24 @@ PREFIX_URL = ''
 gettext = lambda s: s
 LANGUAGES = (
     ('en', gettext('English')),
+    ('de', gettext('German')),
 )
 
+# NOTE: MODELTRANSLATION_LANGUAGES governs translated *model content* (FieldChoice
+# names, pages) and adding a language here requires DB migrations. The interface
+# (UI) translation only needs the LANGUAGES tuple above + a gettext catalog, so we
+# keep this at 'en' for now and add 'de' here later together with migrations.
 MODELTRANSLATION_LANGUAGES = ['en']
 
 MODELTRANSLATION_FIELDCHOICE_LANGUAGES = ['en']
 
 LANGUAGES_LANGUAGE_CODE_3CHAR = (
     ('en', 'eng'),
+    ('de', 'deu'),
 )
 
 # Short (abbreviated) version of how language users call their language, to be used in the langauge picker
-INTERFACE_LANGUAGE_SHORT_NAMES = ['EN']
+INTERFACE_LANGUAGE_SHORT_NAMES = ['EN', 'DE']
 
 # The main interface language
 LANGUAGE_CODE = "en"
@@ -99,7 +105,8 @@ SEPARATE_ENGLISH_IDGLOSS_FIELD = True
 
 # This is a short mapping between 2 and 3 letter language code
 LANGUAGE_CODE_MAP = [
-    {2: 'en', 3: 'eng'}
+    {2: 'en', 3: 'eng'},
+    {2: 'de', 3: 'deu'}
 ]
 
 # Regex patterns for CSV double quote
